@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "278172301654",
+    "project_id": "roadsafedb",
+    "storage_bucket": "roadsafedb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:278172301654:android:936512ca292e0cfa733ef7",
+        "android_client_info": {
+          "package_name": "com.example.saferoad"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBV5R2BucQihuAF-7LPxp78-w066OSthaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
