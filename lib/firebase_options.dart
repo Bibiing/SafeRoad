@@ -46,7 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '278172301654',
     projectId: 'roadsafedb',
     authDomain: 'roadsafedb.firebaseapp.com',
-    storageBucket: 'roadsafedb.firebasestorage.app',
+    storageBucket: 'roadsafedb.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:278172301654:android:936512ca292e0cfa733ef7',
     messagingSenderId: '278172301654',
     projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.firebasestorage.app',
+    storageBucket: 'roadsafedb.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,7 +62,8 @@ class DefaultFirebaseOptions {
     appId: '1:278172301654:ios:42259165922a5890733ef7',
     messagingSenderId: '278172301654',
     projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.firebasestorage.app',
+    storageBucket: 'roadsafedb.appspot.com',
+    iosClientId: '278172301654-aq2gdcmcem1l8i8vgg2o1svtq6b67lbc.apps.googleusercontent.com',
     iosBundleId: 'com.example.saferoad',
   );
 
@@ -71,7 +72,8 @@ class DefaultFirebaseOptions {
     appId: '1:278172301654:ios:42259165922a5890733ef7',
     messagingSenderId: '278172301654',
     projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.firebasestorage.app',
+    storageBucket: 'roadsafedb.appspot.com',
+    iosClientId: '278172301654-aq2gdcmcem1l8i8vgg2o1svtq6b67lbc.apps.googleusercontent.com',
     iosBundleId: 'com.example.saferoad',
   );
 
@@ -81,6 +83,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '278172301654',
     projectId: 'roadsafedb',
     authDomain: 'roadsafedb.firebaseapp.com',
-    storageBucket: 'roadsafedb.firebasestorage.app',
+    storageBucket: 'roadsafedb.appspot.com',
   );
+
 }

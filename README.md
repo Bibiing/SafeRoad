@@ -178,12 +178,12 @@ reports/{reportId}/statusLogs/{logId}
 ## Cara Menjalankan
 
 1. Pastikan Flutter SDK sudah terpasang di perangkat.
-2. Klona repositori ini:
+2. Clone repositori ini:
    ```bash
    git clone https://github.com/Bibiing/SafeRoad.git
    cd SafeRoad
    ```
-3. Pasang seluruh dependensi:
+3. Install seluruh dependensi:
    ```bash
    flutter pub get
    ```
@@ -196,9 +196,26 @@ reports/{reportId}/statusLogs/{logId}
 
 ## Preview Aplikasi
 
+### 1. Halaman Fitur User
+
 <p align="center">
-   <img src="./assets/images/doc2.jpeg" alt="Dokumentasi 2" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
-   <img src="./assets/images/doc1.jpeg" alt="Dokumentasi 1" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/image1.jpg" alt="Dokumentasi 1" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/image2.jpg" alt="Dokumentasi 2" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/image3.jpg" alt="Dokumentasi 3" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/image4.jpg" alt="Dokumentasi 4" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/image5.jpg" alt="Dokumentasi 5" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+</p>
+
+### 2. Halaman Fitur Admin
+
+<p align="center">
+
+</p>
+
+### 3. Halaman Fitur Tambahan
+
+<p align="center">
+
 </p>
 
 ### Referensi
@@ -206,3 +223,4 @@ reports/{reportId}/statusLogs/{logId}
 - Firebase Documentation
 - Google Maps Platform Documentation
 - Flutter Documentation
+

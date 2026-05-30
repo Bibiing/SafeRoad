@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "278172301654",
     "project_id": "roadsafedb",
-    "storage_bucket": "roadsafedb.firebasestorage.app"
+    "storage_bucket": "roadsafedb.appspot.com"
   },
   "client": [
     {
@@ -12,7 +12,12 @@
           "package_name": "com.example.saferoad"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "278172301654-ftrfdfjs2fbl6vtd1pc87nlvl0bhg9d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBV5R2BucQihuAF-7LPxp78-w066OSthaU"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "278172301654-ftrfdfjs2fbl6vtd1pc87nlvl0bhg9d3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "278172301654-aq2gdcmcem1l8i8vgg2o1svtq6b67lbc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.saferoad"
+              }
+            }
+          ]
         }
       }
     }

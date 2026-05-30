@@ -3,82 +3,76 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
-import 'core/constants/app_strings.dart';
-import 'core/routes/app_routes.dart';
-import 'core/theme/app_theme.dart';
+import 'app.dart';
+import 'data/remote/auth_remote_datasource.dart';
+import 'data/remote/fcm_datasource.dart';
+import 'data/remote/location_datasource.dart';
+import 'data/remote/report_remote_datasource.dart';
+import 'data/remote/storage_remote_datasource.dart';
+import 'data/repository/auth_repository_impl.dart';
+import 'data/repository/notification_repository_impl.dart';
+import 'data/repository/report_repository_impl.dart';
+import 'domain/repository/auth_repository.dart';
+import 'domain/repository/notification_repository.dart';
+import 'domain/repository/report_repository.dart';
 import 'firebase_options.dart';
-import 'services/auth_service.dart';
-import 'services/location_service.dart';
-import 'services/report_repository.dart';
-import 'services/storage_service.dart';
-import 'viewmodels/auth_viewmodel.dart';
-import 'viewmodels/report_viewmodel.dart';
-import 'views/auth/login_view.dart';
-import 'views/user/user_home_view.dart';
 
+/// Entry point aplikasi SafeRoad.
+///
+/// Dependency injection:
+/// 1. Buat semua DataSource (concrete implementation).
+/// 2. Buat semua Repository (concrete impl, inject DataSource).
+/// 3. Ekspos Repository via MultiProvider sebagai abstract interface.
+/// 4. ViewModel dibuat per-route lewat ChangeNotifierProvider di masing-masing layar.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeDateFormatting('id');
-  runApp(const SafeRoadApp());
-}
 
-class SafeRoadApp extends StatelessWidget {
-  const SafeRoadApp({super.key});
+  // ── DataSource ─────────────────────────────────────────────────────
+  final authDataSource = FirebaseAuthRemoteDataSource();
+  final reportDataSource = FirestoreReportRemoteDataSource();
+  final storageDataSource = FirebaseStorageRemoteDataSource();
+  final locationDataSource = GeolocatorLocationDataSource();
+  final fcmDataSource = FirebaseFcmDataSource();
 
-  @override
-  Widget build(BuildContext context) {
-    final authService = AuthService();
+  // ── Repository ─────────────────────────────────────────────────────
+  final authRepository = AuthRepositoryImpl(authDataSource);
+  final reportRepository = ReportRepositoryImpl(
+    reportDataSource: reportDataSource,
+    storageDataSource: storageDataSource,
+    locationDataSource: locationDataSource,
+  );
+  final notificationRepository = NotificationRepositoryImpl(fcmDataSource);
 
-    return MultiProvider(
+  // ── Inisialisasi FCM ──────────────────────────────────────────────
+  try {
+    await notificationRepository.initialize();
+    final token = await notificationRepository.getToken();
+    final uid = authRepository.currentUserId;
+    if (uid != null && token != null) {
+      await authRepository.updateFcmToken(uid: uid, token: token);
+    }
+    // Dengarkan token refresh.
+    notificationRepository.onTokenRefresh().listen((newToken) {
+      final currentUid = authRepository.currentUserId;
+      if (currentUid != null) {
+        authRepository.updateFcmToken(uid: currentUid, token: newToken);
+      }
+    });
+  } catch (_) {
+    // FCM mungkin tidak tersedia di emulator — lanjutkan.
+  }
+
+  // ── Run App ────────────────────────────────────────────────────────
+  runApp(
+    MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel(authService)),
-        ChangeNotifierProvider(
-          create: (_) => ReportViewModel(
-            ReportRepository(),
-            StorageService(),
-            LocationService(),
-          ),
-        ),
+        Provider<AuthRepository>.value(value: authRepository),
+        Provider<ReportRepository>.value(value: reportRepository),
+        Provider<NotificationRepository>.value(value: notificationRepository),
       ],
-      child: MaterialApp(
-        title: AppStrings.appName,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        onGenerateRoute: AppRoutes.onGenerateRoute,
-        home: const _AuthGate(),
-      ),
-    );
-  }
-}
-
-/// Tentukan layar awal berdasarkan status login Firebase.
-class _AuthGate extends StatelessWidget {
-  const _AuthGate();
-
-  @override
-  Widget build(BuildContext context) {
-    final authVm = context.read<AuthViewModel>();
-    return StreamBuilder(
-      stream: AuthService().authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        if (snapshot.data != null) {
-          // Pastikan profil termuat sebelum masuk home.
-          // Defer ke frame berikutnya agar tidak memanggil notifyListeners
-          // di tengah build phase, yang menyebabkan setState-during-build crash.
-          if (authVm.currentUser == null) {
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => authVm.loadCurrentUser());
-          }
-          return const UserHomeView();
-        }
-        return const LoginView();
-      },
-    );
-  }
+      child: SafeRoadApp(authRepository: authRepository),
+    ),
+  );
 }
