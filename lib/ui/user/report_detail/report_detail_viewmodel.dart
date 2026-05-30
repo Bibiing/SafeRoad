@@ -1,0 +1,87 @@
+import 'package:flutter/foundation.dart';
+
+import '../../../domain/model/report.dart';
+import '../../../domain/model/report_status_log.dart';
+import '../../../domain/repository/auth_repository.dart';
+import '../../../domain/repository/report_repository.dart';
+import '../../auth/login/login_viewmodel.dart';
+
+/// ViewModel untuk layar detail laporan.
+class ReportDetailViewModel extends ChangeNotifier {
+  final ReportRepository _reportRepository;
+  final AuthRepository _authRepository;
+
+  ReportDetailViewModel({
+    required ReportRepository reportRepository,
+    required AuthRepository authRepository,
+  })  : _reportRepository = reportRepository,
+        _authRepository = authRepository;
+
+  ViewStatus _status = ViewStatus.initial;
+  ViewStatus get status => _status;
+
+  String? _error;
+  String? get error => _error;
+
+  Report? _report;
+  Report? get report => _report;
+
+  List<ReportStatusLog> _statusLogs = const [];
+  List<ReportStatusLog> get statusLogs => List.unmodifiable(_statusLogs);
+
+  bool get isLoading => _status == ViewStatus.loading;
+
+  /// Apakah user saat ini adalah pemilik laporan.
+  bool get isOwner =>
+      _report != null && _report!.userId == _authRepository.currentUserId;
+
+  /// Apakah laporan bisa di-edit/hapus.
+  bool get canEdit => isOwner && (_report?.isEditable ?? false);
+
+  /// Muat detail laporan dan status log.
+  Future<void> loadReport(String reportId) async {
+    _status = ViewStatus.loading;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _report = await _reportRepository.getReportById(reportId);
+      if (_report != null) {
+        _statusLogs = await _reportRepository.getStatusLogs(reportId);
+      }
+      _status = ViewStatus.success;
+    } catch (e) {
+      _error = _extractMessage(e);
+      _status = ViewStatus.failure;
+    }
+    notifyListeners();
+  }
+
+  /// Hapus laporan.
+  Future<bool> deleteReport() async {
+    if (_report == null) return false;
+
+    _status = ViewStatus.loading;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _reportRepository.deleteReport(_report!);
+      _status = ViewStatus.success;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = _extractMessage(e);
+      _status = ViewStatus.failure;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  String _extractMessage(Object e) {
+    final text = e.toString();
+    return text.startsWith('Exception: ')
+        ? text.substring('Exception: '.length)
+        : text;
+  }
+}
