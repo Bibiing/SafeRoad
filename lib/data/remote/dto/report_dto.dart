@@ -15,7 +15,8 @@ class ReportDto {
   final double longitude;
   final String address;
   final String status;
-  final String? rejectionReason;
+  final String? rejectionReason; // Deprecated
+  final String? adminReason;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
 
@@ -31,6 +32,7 @@ class ReportDto {
     this.address = '',
     required this.status,
     this.rejectionReason,
+    this.adminReason,
     this.createdAt,
     this.updatedAt,
   });
@@ -49,6 +51,7 @@ class ReportDto {
       address: (data['address'] ?? '') as String,
       status: (data['status'] ?? 'pending') as String,
       rejectionReason: data['rejectionReason'] as String?,
+      adminReason: data['adminReason'] as String?,
       createdAt: data['createdAt'] as Timestamp?,
       updatedAt: data['updatedAt'] as Timestamp?,
     );
@@ -67,6 +70,7 @@ class ReportDto {
       'address': address,
       'status': status,
       if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      if (adminReason != null) 'adminReason': adminReason,
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -84,6 +88,7 @@ class ReportDto {
       'address': address,
       'status': status,
       if (rejectionReason != null) 'rejectionReason': rejectionReason,
+      if (adminReason != null) 'adminReason': adminReason,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -102,6 +107,7 @@ class ReportDto {
       address: address,
       status: ReportStatus.fromFirestore(status),
       rejectionReason: rejectionReason,
+      adminReason: adminReason,
       createdAt: createdAt?.toDate() ?? DateTime.now(),
       updatedAt: updatedAt?.toDate() ?? DateTime.now(),
     );
@@ -121,6 +127,7 @@ class ReportDto {
       address: report.address,
       status: report.status.toFirestore,
       rejectionReason: report.rejectionReason,
+      adminReason: report.adminReason,
       createdAt: Timestamp.fromDate(report.createdAt),
       updatedAt: Timestamp.fromDate(report.updatedAt),
     );

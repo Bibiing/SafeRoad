@@ -15,7 +15,8 @@ class Report {
   final double longitude;
   final String address;
   final ReportStatus status;
-  final String? rejectionReason;
+  final String? rejectionReason; // Deprecated, use adminReason
+  final String? adminReason;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -29,13 +30,13 @@ class Report {
     required this.latitude,
     required this.longitude,
     this.address = '',
-    this.status = ReportStatus.pending,
+    required this.status,
     this.rejectionReason,
+    this.adminReason,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  /// Kembalikan salinan baru dengan field tertentu diganti.
   Report copyWith({
     String? id,
     String? userId,
@@ -48,6 +49,7 @@ class Report {
     String? address,
     ReportStatus? status,
     String? rejectionReason,
+    String? adminReason,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -63,6 +65,7 @@ class Report {
       address: address ?? this.address,
       status: status ?? this.status,
       rejectionReason: rejectionReason ?? this.rejectionReason,
+      adminReason: adminReason ?? this.adminReason,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

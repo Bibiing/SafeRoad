@@ -168,7 +168,14 @@ class _DetailBody extends StatelessWidget {
             label: 'Dibuat',
             value: DateFormatter.full(report.createdAt),
           ),
-          if (report.rejectionReason != null &&
+          if (report.adminReason != null &&
+              report.adminReason!.isNotEmpty)
+            _InfoField(
+              label: 'Catatan Admin',
+              value: report.adminReason!,
+              valueColor: AppColors.primary,
+            )
+          else if (report.rejectionReason != null &&
               report.rejectionReason!.isNotEmpty)
             _InfoField(
               label: 'Alasan Ditolak',

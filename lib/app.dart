@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
+import 'domain/model/user.dart';
 import 'domain/repository/auth_repository.dart';
+import 'ui/admin/dashboard/admin_dashboard_screen.dart';
 import 'ui/auth/login/login_screen.dart';
 import 'ui/splash/animated_splash_screen.dart';
 import 'ui/user/home/home_screen.dart';
@@ -30,10 +32,7 @@ class SafeRoadApp extends StatelessWidget {
   }
 }
 
-/// Tentukan layar berikutnya berdasarkan status login Firebase.
-///
-/// Dipanggil oleh [AnimatedSplashScreen] setelah animasi selesai,
-/// dan juga tersedia sebagai rute terpisah untuk keperluan lain.
+/// Tentukan layar berikutnya berdasarkan status login Firebase dan Peran (Role).
 class AuthGate extends StatelessWidget {
   final AuthRepository authRepository;
 
@@ -49,10 +48,32 @@ class AuthGate extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        // User terautentikasi → Home.
-        if (snapshot.data != null) {
-          return const HomeScreen();
+
+        final uid = snapshot.data;
+        if (uid != null) {
+          // User terautentikasi -> Ambil profil untuk cek role.
+          return FutureBuilder<AppUser?>(
+            future: authRepository.fetchUser(uid),
+            builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              final user = userSnapshot.data;
+              debugPrint('AuthGate: User UID=$uid, Role=${user?.role}, IsAdmin=${user?.isAdmin}');
+              
+              if (user != null && user.isAdmin) {
+                return const AdminDashboardScreen();
+              }
+
+              // Default ke HomeScreen jika profil gagal diambil atau bukan admin.
+              return const HomeScreen();
+            },
+          );
         }
+
         // Belum login → Login.
         return const LoginScreen();
       },
