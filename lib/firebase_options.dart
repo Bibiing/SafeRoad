@@ -41,49 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCqMia_mihATTHnOAI-5Jpj-oGqBBZnMMI',
-    appId: '1:278172301654:web:4def6f913606ad56733ef7',
-    messagingSenderId: '278172301654',
-    projectId: 'roadsafedb',
-    authDomain: 'roadsafedb.firebaseapp.com',
-    storageBucket: 'roadsafedb.appspot.com',
+    apiKey: 'AIzaSyDYyq0EmhNls3L361V1YJdPBfbkJ4OP7Gg',
+    appId: '1:8415063511:web:a4dc93a190f611f461ef92',
+    messagingSenderId: '8415063511',
+    projectId: 'saferoad-643a9',
+    authDomain: 'saferoad-643a9.firebaseapp.com',
+    storageBucket: 'saferoad-643a9.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBV5R2BucQihuAF-7LPxp78-w066OSthaU',
-    appId: '1:278172301654:android:936512ca292e0cfa733ef7',
-    messagingSenderId: '278172301654',
-    projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.appspot.com',
+    apiKey: 'AIzaSyD1Ep_VLPYodlO8K5mc-DSqzJAKqpgtLUs',
+    appId: '1:8415063511:android:d236d632a364344b61ef92',
+    messagingSenderId: '8415063511',
+    projectId: 'saferoad-643a9',
+    storageBucket: 'saferoad-643a9.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAeeslTX31Lb2JvkLUGu8PFmiR_n5iKjqI',
-    appId: '1:278172301654:ios:42259165922a5890733ef7',
-    messagingSenderId: '278172301654',
-    projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.appspot.com',
-    iosClientId: '278172301654-aq2gdcmcem1l8i8vgg2o1svtq6b67lbc.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCBKcPsnod-1RrOag9Nlhur0YQcVxOOSvk',
+    appId: '1:8415063511:ios:da1129f107e2ac8161ef92',
+    messagingSenderId: '8415063511',
+    projectId: 'saferoad-643a9',
+    storageBucket: 'saferoad-643a9.firebasestorage.app',
     iosBundleId: 'com.example.saferoad',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAeeslTX31Lb2JvkLUGu8PFmiR_n5iKjqI',
-    appId: '1:278172301654:ios:42259165922a5890733ef7',
-    messagingSenderId: '278172301654',
-    projectId: 'roadsafedb',
-    storageBucket: 'roadsafedb.appspot.com',
-    iosClientId: '278172301654-aq2gdcmcem1l8i8vgg2o1svtq6b67lbc.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCBKcPsnod-1RrOag9Nlhur0YQcVxOOSvk',
+    appId: '1:8415063511:ios:da1129f107e2ac8161ef92',
+    messagingSenderId: '8415063511',
+    projectId: 'saferoad-643a9',
+    storageBucket: 'saferoad-643a9.firebasestorage.app',
     iosBundleId: 'com.example.saferoad',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCqMia_mihATTHnOAI-5Jpj-oGqBBZnMMI',
-    appId: '1:278172301654:web:1c113e5409e9131e733ef7',
-    messagingSenderId: '278172301654',
-    projectId: 'roadsafedb',
-    authDomain: 'roadsafedb.firebaseapp.com',
-    storageBucket: 'roadsafedb.appspot.com',
+    apiKey: 'AIzaSyDYyq0EmhNls3L361V1YJdPBfbkJ4OP7Gg',
+    appId: '1:8415063511:web:5c2d6f82945c894261ef92',
+    messagingSenderId: '8415063511',
+    projectId: 'saferoad-643a9',
+    authDomain: 'saferoad-643a9.firebaseapp.com',
+    storageBucket: 'saferoad-643a9.firebasestorage.app',
   );
-
 }

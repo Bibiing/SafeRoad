@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -26,13 +29,14 @@ import 'firebase_options.dart';
 /// 4. ViewModel dibuat per-route lewat ChangeNotifierProvider di masing-masing layar.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeDateFormatting('id');
 
   // ── DataSource ─────────────────────────────────────────────────────
   final authDataSource = FirebaseAuthRemoteDataSource();
   final reportDataSource = FirestoreReportRemoteDataSource();
-  final storageDataSource = FirebaseStorageRemoteDataSource();
+  final storageDataSource = ImageKitStorageRemoteDataSource();
   final locationDataSource = GeolocatorLocationDataSource();
   final fcmDataSource = FirebaseFcmDataSource();
 
@@ -45,24 +49,27 @@ Future<void> main() async {
   );
   final notificationRepository = NotificationRepositoryImpl(fcmDataSource);
 
-  // ── Inisialisasi FCM ──────────────────────────────────────────────
-  try {
-    await notificationRepository.initialize();
-    final token = await notificationRepository.getToken();
-    final uid = authRepository.currentUserId;
-    if (uid != null && token != null) {
-      await authRepository.updateFcmToken(uid: uid, token: token);
-    }
-    // Dengarkan token refresh.
-    notificationRepository.onTokenRefresh().listen((newToken) {
-      final currentUid = authRepository.currentUserId;
-      if (currentUid != null) {
-        authRepository.updateFcmToken(uid: currentUid, token: newToken);
+  // ── Inisialisasi FCM (Non-blocking) ──────────────────────────────
+  // Dilakukan secara asinkron agar tidak menghambat startup bila FIS/FCM bermasalah.
+  unawaited(() async {
+    try {
+      await notificationRepository.initialize();
+      final token = await notificationRepository.getToken();
+      final uid = authRepository.currentUserId;
+      if (uid != null && token != null) {
+        await authRepository.updateFcmToken(uid: uid, token: token);
       }
-    });
-  } catch (_) {
-    // FCM mungkin tidak tersedia di emulator — lanjutkan.
-  }
+      // Dengarkan token refresh.
+      notificationRepository.onTokenRefresh().listen((newToken) {
+        final currentUid = authRepository.currentUserId;
+        if (currentUid != null) {
+          authRepository.updateFcmToken(uid: currentUid, token: newToken);
+        }
+      });
+    } catch (e) {
+      debugPrint('FCM Initialization failed: $e');
+    }
+  }());
 
   // ── Run App ────────────────────────────────────────────────────────
   runApp(

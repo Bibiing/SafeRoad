@@ -39,6 +39,10 @@ dependencies:
   # Animasi
   flutter_animate: ^4.5.0
 
+  # Network & Env
+  dio: ^5.7.0
+  flutter_dotenv: ^5.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -57,6 +61,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - .env
     - assets/images/
 
 # ── App Launcher Icon ─────────────────────────────────────────────────────────
