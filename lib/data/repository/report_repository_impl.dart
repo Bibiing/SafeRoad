@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import '../../domain/model/enums.dart';
 import '../../domain/model/report.dart';
 import '../../domain/model/report_status_log.dart';
 import '../../domain/repository/report_repository.dart';
 import '../remote/dto/report_dto.dart';
+import '../remote/dto/report_status_log_dto.dart';
 import '../remote/location_datasource.dart';
 import '../remote/report_remote_datasource.dart';
 import '../remote/storage_remote_datasource.dart';
@@ -70,6 +72,23 @@ class ReportRepositoryImpl implements ReportRepository {
   Future<List<ReportStatusLog>> getStatusLogs(String reportId) async {
     final dtos = await _reportDataSource.getStatusLogs(reportId);
     return dtos.map((d) => d.toDomain()).toList(growable: false);
+  }
+
+  @override
+  Future<void> addStatusLog({
+    required String reportId,
+    required String updatedBy,
+    required ReportStatus newStatus,
+    String note = '',
+  }) {
+    final dto = ReportStatusLogDto(
+      id: '',
+      reportId: reportId,
+      status: newStatus.toFirestore,
+      updatedBy: updatedBy,
+      note: note,
+    );
+    return _reportDataSource.addStatusLog(dto);
   }
 
   @override

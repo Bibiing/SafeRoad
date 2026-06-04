@@ -6,9 +6,11 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'app.dart';
+import 'core/utils/local_notification_service.dart';
 import 'data/remote/auth_remote_datasource.dart';
 import 'data/remote/fcm_datasource.dart';
 import 'data/remote/location_datasource.dart';
+import 'data/remote/notification_remote_datasource.dart';
 import 'data/remote/report_remote_datasource.dart';
 import 'data/remote/storage_remote_datasource.dart';
 import 'data/repository/auth_repository_impl.dart';
@@ -30,6 +32,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeDateFormatting('id');
+  await LocalNotificationService.initialize();
 
   // ── DataSource ─────────────────────────────────────────────────────
   final authDataSource = FirebaseAuthRemoteDataSource();
@@ -37,6 +40,7 @@ Future<void> main() async {
   final storageDataSource = ImageKitStorageRemoteDataSource();
   final locationDataSource = GeolocatorLocationDataSource();
   final fcmDataSource = FirebaseFcmDataSource();
+  final notifDataSource = FirestoreNotificationRemoteDataSource();
 
   // ── Repository ─────────────────────────────────────────────────────
   final authRepository = AuthRepositoryImpl(authDataSource);
@@ -45,7 +49,7 @@ Future<void> main() async {
     storageDataSource: storageDataSource,
     locationDataSource: locationDataSource,
   );
-  final notificationRepository = NotificationRepositoryImpl(fcmDataSource);
+  final notificationRepository = NotificationRepositoryImpl(fcmDataSource, notifDataSource);
 
   // ── Inisialisasi FCM (Non-blocking) ──────────────────────────────
   // Dilakukan secara asinkron agar tidak menghambat startup bila FIS/FCM bermasalah.

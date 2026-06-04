@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../model/enums.dart';
 import '../model/report.dart';
 import '../model/report_status_log.dart';
 
@@ -28,6 +29,19 @@ abstract class ReportRepository {
 
   /// Ambil daftar status log untuk laporan [reportId], urut kronologis.
   Future<List<ReportStatusLog>> getStatusLogs(String reportId);
+
+  /// Catat perubahan status laporan ke sub-collection `statusLogs`.
+  ///
+  /// [reportId] — ID laporan yang statusnya berubah.
+  /// [updatedBy] — UID admin yang melakukan perubahan.
+  /// [newStatus] — Status baru.
+  /// [note] — Catatan / alasan dari admin (opsional).
+  Future<void> addStatusLog({
+    required String reportId,
+    required String updatedBy,
+    required ReportStatus newStatus,
+    String note = '',
+  });
 
   /// Upload satu atau lebih foto, kembalikan daftar URL unduh.
   Future<List<String>> uploadImages({

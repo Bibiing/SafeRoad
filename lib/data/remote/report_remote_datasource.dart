@@ -25,6 +25,9 @@ abstract class ReportRemoteDataSource {
 
   /// Ambil status log untuk laporan [reportId].
   Future<List<ReportStatusLogDto>> getStatusLogs(String reportId);
+
+  /// Tambah entri status log ke sub-collection `statusLogs`.
+  Future<void> addStatusLog(ReportStatusLogDto dto);
 }
 
 /// Implementasi [ReportRemoteDataSource] menggunakan Cloud Firestore.
@@ -89,5 +92,18 @@ class FirestoreReportRemoteDataSource implements ReportRemoteDataSource {
     return snap.docs
         .map((d) => ReportStatusLogDto.fromFirestore(d.id, reportId, d.data()))
         .toList(growable: false);
+  }
+
+  @override
+  Future<void> addStatusLog(ReportStatusLogDto dto) {
+    return _reports
+        .doc(dto.reportId)
+        .collection('statusLogs')
+        .add({
+      'status': dto.status,
+      'updatedBy': dto.updatedBy,
+      'note': dto.note,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 }

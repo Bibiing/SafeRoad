@@ -6,6 +6,8 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
+import '../../../domain/repository/auth_repository.dart';
+import '../../../domain/repository/notification_repository.dart';
 import '../../../domain/repository/report_repository.dart';
 import '../../auth/login/login_viewmodel.dart';
 import 'all_reports_viewmodel.dart';
@@ -17,8 +19,10 @@ class AllReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AllReportsViewModel(
-        reportRepository: context.read<ReportRepository>(),
+      create: (ctx) => AllReportsViewModel(
+        reportRepository: ctx.read<ReportRepository>(),
+        notificationRepository: ctx.read<NotificationRepository>(),
+        adminUid: ctx.read<AuthRepository>().currentUserId,
       )..fetchAllReports(),
       child: Scaffold(
         appBar: AppBar(

@@ -6,15 +6,24 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
+import '../../../domain/repository/notification_repository.dart';
 import '../../../domain/repository/report_repository.dart';
 import '../../auth/login/login_viewmodel.dart';
 
 /// ViewModel daftar semua laporan (admin).
 class AllReportsViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
+  final NotificationRepository _notificationRepository;
 
-  AllReportsViewModel({required ReportRepository reportRepository})
-      : _reportRepository = reportRepository;
+  /// [adminUid] — UID admin yang sedang login, untuk dicatat di statusLog.
+  final String? adminUid;
+
+  AllReportsViewModel({
+    required ReportRepository reportRepository,
+    required NotificationRepository notificationRepository,
+    this.adminUid,
+  })  : _reportRepository = reportRepository,
+        _notificationRepository = notificationRepository;
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
@@ -68,15 +77,37 @@ class AllReportsViewModel extends ChangeNotifier {
   }
 
   /// Perbarui status laporan.
+  ///
+  /// Setelah update Firestore berhasil:
+  /// 1. Tulis status log ke sub-collection `statusLogs`.
+  /// 2. Kirim notifikasi ke user pemilik laporan via Firestore.
   Future<bool> updateStatus(Report report, ReportStatus newStatus, {String? reason}) async {
     try {
+      final oldStatus = report.status;
       final updatedReport = report.copyWith(
         status: newStatus,
         adminReason: reason,
         updatedAt: DateTime.now(),
       );
       await _reportRepository.updateReport(updatedReport);
-      
+
+      // 1. Tulis status log.
+      await _reportRepository.addStatusLog(
+        reportId: report.id,
+        updatedBy: adminUid ?? 'admin',
+        newStatus: newStatus,
+        note: reason ?? '',
+      );
+
+      // 2. Kirim notifikasi ke user pemilik laporan.
+      await _notificationRepository.sendStatusChangeNotification(
+        userId: report.userId,
+        reportId: report.id,
+        reportTitle: report.title,
+        oldStatus: oldStatus,
+        newStatus: newStatus,
+      );
+
       // Update list lokal
       final index = _reports.indexWhere((r) => r.id == report.id);
       if (index != -1) {
