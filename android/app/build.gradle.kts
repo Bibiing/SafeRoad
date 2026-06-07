@@ -29,7 +29,21 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // Override the default debug signing config to use the shared keystore
+        // checked into the repo, so every teammate gets the same SHA-1/256.
+        getByName("debug") {
+            storeFile = file("../debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.

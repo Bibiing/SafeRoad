@@ -12,3 +12,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Shared debug keystore so the whole team signs with the same SHA (Google Sign-In).
+!debug.keystore
