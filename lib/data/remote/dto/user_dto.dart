@@ -14,6 +14,9 @@ class UserDto {
   final String role;
   final String? fcmToken;
   final Timestamp? createdAt;
+  final String provider;
+  final String? photoUrl;
+  final int contributionPoints;
 
   const UserDto({
     required this.uid,
@@ -22,6 +25,9 @@ class UserDto {
     required this.role,
     this.fcmToken,
     this.createdAt,
+    this.provider = 'email',
+    this.photoUrl,
+    this.contributionPoints = 0,
   });
 
   /// Parse dari dokumen Firestore.
@@ -33,6 +39,9 @@ class UserDto {
       role: (data['role'] ?? 'user') as String,
       fcmToken: data['fcmToken'] as String?,
       createdAt: data['createdAt'] as Timestamp?,
+      provider: (data['provider'] ?? 'email') as String,
+      photoUrl: data['photoUrl'] as String?,
+      contributionPoints: (data['contributionPoints'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -44,6 +53,9 @@ class UserDto {
       'role': role,
       if (fcmToken != null) 'fcmToken': fcmToken,
       'createdAt': createdAt ?? FieldValue.serverTimestamp(),
+      'provider': provider,
+      if (photoUrl != null) 'photoUrl': photoUrl,
+      'contributionPoints': contributionPoints,
     };
   }
 
@@ -56,6 +68,9 @@ class UserDto {
       role: UserRole.fromFirestore(role),
       fcmToken: fcmToken,
       createdAt: createdAt?.toDate() ?? DateTime.now(),
+      provider: provider,
+      photoUrl: photoUrl,
+      contributionPoints: contributionPoints,
     );
   }
 
@@ -68,6 +83,9 @@ class UserDto {
       role: user.role.toFirestore,
       fcmToken: user.fcmToken,
       createdAt: Timestamp.fromDate(user.createdAt),
+      provider: user.provider,
+      photoUrl: user.photoUrl,
+      contributionPoints: user.contributionPoints,
     );
   }
 }

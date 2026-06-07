@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk layar edit laporan.
 class EditReportViewModel extends ChangeNotifier {
@@ -13,6 +14,8 @@ class EditReportViewModel extends ChangeNotifier {
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
+
+  bool get isLoading => _status == ViewStatus.loading;
 
   String? _error;
   String? get error => _error;
@@ -42,17 +45,11 @@ class EditReportViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
       notifyListeners();
       return false;
     }
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
-  }
 }

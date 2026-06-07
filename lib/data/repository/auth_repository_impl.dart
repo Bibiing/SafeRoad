@@ -47,6 +47,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AppUser?> signInWithGoogle() async {
+    final dto = await _dataSource.signInWithGoogle();
+    return dto?.toDomain();
+  }
+
+  @override
   Future<void> signOut() => _dataSource.signOut();
 
   @override
@@ -55,5 +61,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String token,
   }) {
     return _dataSource.updateFcmToken(uid: uid, token: token);
+  }
+
+  @override
+  Future<void> incrementPoints(String uid, int delta) {
+    return _dataSource.incrementPoints(uid, delta);
   }
 }

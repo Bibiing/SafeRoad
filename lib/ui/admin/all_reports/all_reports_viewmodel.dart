@@ -6,14 +6,17 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
+import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/notification_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel daftar semua laporan (admin).
 class AllReportsViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
   final NotificationRepository _notificationRepository;
+  final AuthRepository _authRepository;
 
   /// [adminUid] — UID admin yang sedang login, untuk dicatat di statusLog.
   final String? adminUid;
@@ -21,12 +24,16 @@ class AllReportsViewModel extends ChangeNotifier {
   AllReportsViewModel({
     required ReportRepository reportRepository,
     required NotificationRepository notificationRepository,
+    required AuthRepository authRepository,
     this.adminUid,
   })  : _reportRepository = reportRepository,
-        _notificationRepository = notificationRepository;
+        _notificationRepository = notificationRepository,
+        _authRepository = authRepository;
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
+
+  bool get isLoading => _status == ViewStatus.loading;
 
   List<Report> _reports = [];
   
@@ -69,7 +76,7 @@ class AllReportsViewModel extends ChangeNotifier {
       _reports = await _reportRepository.getAllReports();
       _status = ViewStatus.success;
     } catch (e) {
-      _error = e.toString();
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     } finally {
       notifyListeners();
@@ -108,15 +115,34 @@ class AllReportsViewModel extends ChangeNotifier {
         newStatus: newStatus,
       );
 
-      // Update list lokal
-      final index = _reports.indexWhere((r) => r.id == report.id);
-      if (index != -1) {
-        _reports[index] = updatedReport;
-        notifyListeners();
+      // 3. Poin kontribusi untuk PEMILIK laporan (Tahap 6) — hanya saat status
+      // benar-benar berubah. +25 saat selesai, +5 saat diverifikasi.
+      // Best-effort: kegagalan poin tidak menggagalkan pembaruan status.
+      if (newStatus != oldStatus) {
+        final delta = newStatus == ReportStatus.completed
+            ? 25
+            : (newStatus == ReportStatus.verified ? 5 : 0);
+        if (delta > 0) {
+          try {
+            await _authRepository.incrementPoints(report.userId, delta);
+          } catch (_) {}
+        }
       }
+
+      // Segarkan dari server (SSOT) — pola "refetch ringan" yang konsisten
+      // dengan modul User (yang juga mengambil ulang data setelah mutasi).
+      // Tidak memunculkan spinner agar UX mulus; bila refetch gagal, jatuh ke
+      // mutasi lokal agar UI tetap mencerminkan perubahan yang sudah sukses.
+      try {
+        _reports = await _reportRepository.getAllReports();
+      } catch (_) {
+        final index = _reports.indexWhere((r) => r.id == report.id);
+        if (index != -1) _reports[index] = updatedReport;
+      }
+      notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = mapErrorToMessage(e);
       notifyListeners();
       return false;
     }
@@ -146,7 +172,7 @@ class AllReportsViewModel extends ChangeNotifier {
         r.category.label,
         r.address,
         r.status.label,
-        r.adminReason ?? '-',
+        r.effectiveAdminReason ?? '-',
         r.createdAt.toIso8601String(),
       ]);
     }

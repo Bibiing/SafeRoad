@@ -1,10 +1,9 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../domain/model/user.dart';
 import '../../../domain/repository/auth_repository.dart';
-
-/// Status operasi async.
-enum ViewStatus { initial, loading, success, failure }
 
 /// ViewModel untuk layar login.
 ///
@@ -44,17 +43,36 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
       notifyListeners();
       return false;
     }
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
+  /// Masuk dengan Google. Kembalikan `true` bila sukses; `false` bila gagal
+  /// atau dibatalkan user (pembatalan tidak menampilkan error).
+  Future<bool> loginWithGoogle() async {
+    _status = ViewStatus.loading;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      if (user == null) {
+        _status = ViewStatus.initial;
+        notifyListeners();
+        return false;
+      }
+      _currentUser = user;
+      _status = ViewStatus.success;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = mapErrorToMessage(e);
+      _status = ViewStatus.failure;
+      notifyListeners();
+      return false;
+    }
   }
 }

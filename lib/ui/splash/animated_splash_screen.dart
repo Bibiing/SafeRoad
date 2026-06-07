@@ -1,19 +1,25 @@
-import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../auth/login/login_screen.dart';
-import '../user/home/home_screen.dart';
-import '../../domain/repository/auth_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
-/// Layar splash beranimasi yang tampil setelah native splash,
-/// sebelum masuk ke alur AuthGate.
+import '../../app.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../domain/repository/auth_repository.dart';
+
+/// Layar splash beranimasi yang tampil setelah native splash, sebelum masuk
+/// ke alur [AuthGate].
 ///
-/// Animasi:
-/// - Logo: fade-in + scale dari 0.75 → 1.0 (curve: easeOutBack)
-/// - Teks "SafeRoad": fade-in + slide-up 12px (dengan delay)
-/// - Total durasi: ~2.3 detik, lalu navigasi ke AuthGate.
+/// Animasi (memakai `flutter_animate`):
+/// - Logo: fade-in + scale-up (0.8 → 1.0) + sedikit naik (16px → 0) dengan
+///   curve `easeOutCubic`, lalu satu micro pulse halus (1.0 → 1.02 → 1.0).
+///   Di bawah logo ada bayangan hijau lembut yang mengikuti bentuk logo
+///   (kesan "mengambang"), bukan glow mencolok.
+/// - Teks "SafeRoad" + tagline: fade-in + slide-up berurutan (staggered).
+/// - Total ~2.6 detik lalu fade-transition ke [AuthGate].
 class AnimatedSplashScreen extends StatefulWidget {
   const AnimatedSplashScreen({super.key});
 
@@ -21,153 +27,158 @@ class AnimatedSplashScreen extends StatefulWidget {
   State<AnimatedSplashScreen> createState() => _AnimatedSplashScreenState();
 }
 
-class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  // ── Logo animations ────────────────────────────────────────────────
-  late final Animation<double> _logoScale;
-  late final Animation<double> _logoOpacity;
-
-  // ── Text animations (delayed) ──────────────────────────────────────
-  late final Animation<double> _textOpacity;
-  late final Animation<Offset> _textSlide;
+class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
+  static const _holdDuration = Duration(milliseconds: 2600);
 
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    );
-
-    // Logo: scale 0.75 → 1.0 dengan easeOutBack (efek pop ramah)
-    _logoScale = Tween<double>(begin: 0.75, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.65, curve: Curves.easeOutBack),
-      ),
-    );
-
-    // Logo: opacity 0 → 1
-    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.45, curve: Curves.easeOut),
-      ),
-    );
-
-    // Teks: opacity 0 → 1 (mulai setelah 40% controller)
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.40, 0.80, curve: Curves.easeOut),
-      ),
-    );
-
-    // Teks: slide dari bawah 12px → posisi normal
-    _textSlide = Tween<Offset>(
-      begin: const Offset(0, 0.35),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.40, 0.80, curve: Curves.easeOut),
-      ),
-    );
-
-    // Jalankan animasi lalu navigate setelah total ~2.3 detik
-    _controller.forward().then((_) {
-      Future.delayed(const Duration(milliseconds: 900), _navigateNext);
-    });
+    // `flutter_animate` mengelola siklus animasi sendiri (tidak ada controller
+    // manual yang perlu di-dispose). Kita hanya menjadwalkan navigasi.
+    Future.delayed(_holdDuration, _navigateNext);
   }
 
-  /// Navigate ke AuthGate (login atau home berdasarkan status Firebase Auth).
+  /// Navigasi ke [AuthGate] agar routing berbasis peran (user/admin) konsisten,
+  /// termasuk saat cold-start dengan sesi yang masih aktif.
   void _navigateNext() {
     if (!mounted) return;
     final authRepository = context.read<AuthRepository>();
-    final uid = authRepository.currentUserId;
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) =>
-            uid != null ? const HomeScreen() : const LoginScreen(),
-        transitionsBuilder: (_, animation, __, child) => FadeTransition(
+        pageBuilder: (_, _, _) => AuthGate(authRepository: authRepository),
+        transitionsBuilder: (_, animation, _, child) => FadeTransition(
           opacity: animation,
           child: child,
         ),
-        transitionDuration: const Duration(milliseconds: 400),
+        transitionDuration: const Duration(milliseconds: 450),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F5),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ── Logo ────────────────────────────────────────────────
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (_, __) => FadeTransition(
-                opacity: _logoOpacity,
-                child: ScaleTransition(
-                  scale: _logoScale,
-                  child: Image.asset(
-                    'assets/images/logo-saferoad.png',
-                    width: 120,
-                    height: 120,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.primaryTint, AppColors.background],
+            stops: [0.0, 0.55],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Logo + bayangan hijau natural ───────────────────────
+              const _LogoWithShadow()
+                  .animate()
+                  .fadeIn(duration: 600.ms, curve: Curves.easeOut)
+                  .scaleXY(
+                    begin: 0.8,
+                    end: 1.0,
+                    duration: 700.ms,
+                    curve: Curves.easeOutCubic,
+                  )
+                  .moveY(
+                    begin: 16,
+                    end: 0,
+                    duration: 700.ms,
+                    curve: Curves.easeOutCubic,
+                  )
+                  // Micro pulse sekali setelah logo muncul (naik lalu kembali).
+                  .then(delay: 240.ms)
+                  .scaleXY(
+                    begin: 1.0,
+                    end: 1.02,
+                    duration: 560.ms,
+                    curve: Curves.easeInOut,
+                  )
+                  .then()
+                  .scaleXY(
+                    begin: 1.02,
+                    end: 1.0,
+                    duration: 560.ms,
+                    curve: Curves.easeInOut,
                   ),
-                ),
-              ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
-            // ── Teks "SafeRoad" ──────────────────────────────────────
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (_, __) => FadeTransition(
-                opacity: _textOpacity,
-                child: SlideTransition(
-                  position: _textSlide,
-                  child: Column(
-                    children: [
-                      Text(
-                        'SafeRoad',
-                        style: AppTextStyles.heading.copyWith(
-                          fontSize: 30,
-                          color: AppColors.primary,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Laporkan kerusakan jalan & fasilitas publik',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 13,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+              // ── Teks "SafeRoad" ─────────────────────────────────────
+              Text(
+                AppConstants.appName,
+                style: AppTextStyles.heading.copyWith(
+                  fontSize: 30,
+                  color: AppColors.primary,
+                  letterSpacing: -0.5,
                 ),
-              ),
-            ),
-          ],
+              )
+                  .animate()
+                  .fadeIn(delay: 520.ms, duration: 520.ms)
+                  .moveY(begin: 12, end: 0, delay: 520.ms, duration: 520.ms),
+
+              const SizedBox(height: 8),
+
+              // ── Tagline ─────────────────────────────────────────────
+              Text(
+                AppConstants.appTagline,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              )
+                  .animate()
+                  .fadeIn(delay: 760.ms, duration: 520.ms)
+                  .moveY(begin: 12, end: 0, delay: 760.ms, duration: 520.ms),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+/// Logo SafeRoad dengan bayangan hijau lembut.
+///
+/// Bayangan dibuat dari siluet logo itu sendiri (di-tint hijau via
+/// `BlendMode.srcIn`), di-blur, lalu digeser sedikit ke bawah — sehingga
+/// bayangan mengikuti bentuk logo dan tidak terlihat seperti kotak meski
+/// logo punya area transparan.
+class _LogoWithShadow extends StatelessWidget {
+  const _LogoWithShadow();
+
+  static const double _size = 118;
+  static const String _asset = 'assets/images/logo-saferoad.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Transform.translate(
+          offset: const Offset(0, 10),
+          child: ImageFiltered(
+            imageFilter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Image.asset(
+              _asset,
+              width: _size,
+              height: _size,
+              fit: BoxFit.contain,
+              color: AppColors.primary.withValues(alpha: 0.28),
+              colorBlendMode: BlendMode.srcIn,
+            ),
+          ),
+        ),
+        Image.asset(
+          _asset,
+          width: _size,
+          height: _size,
+          fit: BoxFit.contain,
+        ),
+      ],
     );
   }
 }

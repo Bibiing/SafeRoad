@@ -24,9 +24,19 @@ abstract class AuthRepository {
     required String password,
   });
 
-  /// Logout dari sesi aktif.
+  /// Masuk / daftar dengan akun Google.
+  ///
+  /// Kembalikan profil [AppUser]; bila user baru, dokumen `users/{uid}` dibuat
+  /// dengan role default `user` dan provider `google`. Mengembalikan `null`
+  /// bila user membatalkan dialog Google (bukan error).
+  Future<AppUser?> signInWithGoogle();
+
+  /// Logout dari sesi aktif (termasuk sesi Google bila ada).
   Future<void> signOut();
 
   /// Perbarui FCM token di profil user.
   Future<void> updateFcmToken({required String uid, required String token});
+
+  /// Tambahkan [delta] poin kontribusi ke `users/{uid}` (akumulatif).
+  Future<void> incrementPoints(String uid, int delta);
 }

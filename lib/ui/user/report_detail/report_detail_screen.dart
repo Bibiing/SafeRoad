@@ -8,6 +8,7 @@ import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/status_helper.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../../../core/widgets/status_pill.dart';
+import '../../../domain/model/enums.dart';
 import '../../../domain/model/report_status_log.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
@@ -168,19 +169,15 @@ class _DetailBody extends StatelessWidget {
             label: 'Dibuat',
             value: DateFormatter.full(report.createdAt),
           ),
-          if (report.adminReason != null &&
-              report.adminReason!.isNotEmpty)
+          if (report.effectiveAdminReason != null)
             _InfoField(
-              label: 'Catatan Admin',
-              value: report.adminReason!,
-              valueColor: AppColors.primary,
-            )
-          else if (report.rejectionReason != null &&
-              report.rejectionReason!.isNotEmpty)
-            _InfoField(
-              label: 'Alasan Ditolak',
-              value: report.rejectionReason!,
-              valueColor: AppColors.error,
+              label: report.status == ReportStatus.rejected
+                  ? 'Alasan Ditolak'
+                  : 'Catatan Admin',
+              value: report.effectiveAdminReason!,
+              valueColor: report.status == ReportStatus.rejected
+                  ? AppColors.error
+                  : AppColors.primary,
             ),
 
           // ── Timeline Status ──

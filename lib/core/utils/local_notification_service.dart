@@ -28,7 +28,11 @@ class LocalNotificationService {
   static Future<void> initialize() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
+    const iosSettings = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
 
     await _plugin.initialize(
       initSettings,
@@ -57,7 +61,11 @@ class LocalNotificationService {
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
     );
-    const details = NotificationDetails(android: androidDetails);
+    const iosDetails = DarwinNotificationDetails();
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     await _plugin.show(id, title, body, details, payload: payload);
   }

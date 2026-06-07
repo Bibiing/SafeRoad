@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk Dashboard Admin.
 class AdminDashboardViewModel extends ChangeNotifier {
@@ -14,6 +15,8 @@ class AdminDashboardViewModel extends ChangeNotifier {
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
+
+  bool get isLoading => _status == ViewStatus.loading;
 
   List<Report> _reports = [];
   
@@ -37,7 +40,7 @@ class AdminDashboardViewModel extends ChangeNotifier {
       _reports = await _reportRepository.getAllReports();
       _status = ViewStatus.success;
     } catch (e) {
-      _error = e.toString();
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     } finally {
       notifyListeners();

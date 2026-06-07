@@ -6,7 +6,8 @@ import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk layar Buat Laporan.
 class CreateReportViewModel extends ChangeNotifier {
@@ -21,6 +22,8 @@ class CreateReportViewModel extends ChangeNotifier {
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
+
+  bool get isLoading => _status == ViewStatus.loading;
 
   String? _error;
   String? get error => _error;
@@ -57,7 +60,7 @@ class CreateReportViewModel extends ChangeNotifier {
         loc.longitude,
       );
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
     } finally {
       _locating = false;
       notifyListeners();
@@ -114,21 +117,22 @@ class CreateReportViewModel extends ChangeNotifier {
       );
 
       await _reportRepository.createReport(report);
+
+      // +10 poin kontribusi untuk laporan baru (Tahap 6). Best-effort —
+      // kegagalan poin tidak boleh menggagalkan laporan yang sudah tersimpan.
+      try {
+        await _authRepository.incrementPoints(uid, 10);
+      } catch (_) {}
+
       _status = ViewStatus.success;
       notifyListeners();
       return true;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
       notifyListeners();
       return false;
     }
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
-  }
 }

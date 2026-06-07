@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/model/report_status_log.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../additional/realtime_sync/realtime_sync_service.dart';
 
 /// ViewModel untuk layar detail laporan.
 class ReportDetailViewModel extends ChangeNotifier {
@@ -16,6 +20,10 @@ class ReportDetailViewModel extends ChangeNotifier {
     required AuthRepository authRepository,
   })  : _reportRepository = reportRepository,
         _authRepository = authRepository;
+
+  late final RealtimeSyncService _realtimeSync =
+      RealtimeSyncService(_reportRepository);
+  StreamSubscription<Report?>? _reportSub;
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;
@@ -50,11 +58,33 @@ class ReportDetailViewModel extends ChangeNotifier {
         _statusLogs = await _reportRepository.getStatusLogs(reportId);
       }
       _status = ViewStatus.success;
+      _startWatching(reportId);
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     }
     notifyListeners();
+  }
+
+  /// Mulai memantau laporan secara realtime via [RealtimeSyncService].
+  ///
+  /// Saat admin mengubah status, perubahan langsung tampil tanpa refresh.
+  /// Bila status berubah, timeline status log ikut disegarkan.
+  void _startWatching(String reportId) {
+    _reportSub?.cancel();
+    _reportSub = _realtimeSync.watchReport(reportId).listen((report) async {
+      if (report == null) return;
+      final statusChanged = _report?.status != report.status;
+      _report = report;
+      if (statusChanged) {
+        try {
+          _statusLogs = await _reportRepository.getStatusLogs(reportId);
+        } catch (_) {
+          // Abaikan kegagalan refresh log; status utama tetap diperbarui.
+        }
+      }
+      notifyListeners();
+    });
   }
 
   /// Hapus laporan.
@@ -71,17 +101,16 @@ class ReportDetailViewModel extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
       notifyListeners();
       return false;
     }
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
+  @override
+  void dispose() {
+    _reportSub?.cancel();
+    super.dispose();
   }
 }

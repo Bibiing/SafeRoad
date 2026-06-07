@@ -3,9 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/loading_indicator.dart';
+import '../../../core/widgets/primary_button.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../additional/statistics/statistics_screen.dart';
 import '../all_reports/all_reports_screen.dart';
 import 'admin_dashboard_viewmodel.dart';
 
@@ -21,92 +24,120 @@ class AdminDashboardScreen extends StatelessWidget {
       )..loadDashboard(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Admin Dashboard'),
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.textPrimary,
-          elevation: 0.5,
+          title: Row(
+            children: [
+              const Text('Dasbor Admin'),
+              const SizedBox(width: 8),
+              const _AdminBadge(),
+            ],
+          ),
           actions: [
             IconButton(
               onPressed: () => context.read<AuthRepository>().signOut(),
-              icon: const Icon(Icons.logout, color: Colors.red),
+              icon: const Icon(Icons.logout, color: AppColors.error),
+              tooltip: 'Keluar',
             ),
           ],
         ),
         body: Consumer<AdminDashboardViewModel>(
           builder: (context, vm, child) {
-            if (vm.status == ViewStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
+            if (vm.isLoading) {
+              return const LoadingIndicator(message: 'Memuat data...');
             }
 
             return RefreshIndicator(
+              color: AppColors.primary,
               onRefresh: vm.loadDashboard,
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  Text('Ringkasan Laporan', style: AppTextStyles.subtitle),
-                  const SizedBox(height: 16),
-                  
                   // ── Grid Statistik ──
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.4,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: 1.15,
                     children: [
                       _StatCard(
-                        label: 'Total',
+                        label: 'Total Laporan',
                         value: vm.totalReports,
                         color: AppColors.primary,
-                        icon: Icons.assignment,
+                        icon: Icons.assignment_outlined,
                       ),
                       _StatCard(
                         label: 'Menunggu',
                         value: vm.pendingReports,
-                        color: Colors.orange,
+                        color: AppColors.statusPending,
                         icon: Icons.hourglass_empty,
                       ),
                       _StatCard(
                         label: 'Diproses',
                         value: vm.inProgressReports,
-                        color: Colors.blue,
+                        color: AppColors.statusInProgress,
                         icon: Icons.engineering,
                       ),
                       _StatCard(
                         label: 'Selesai',
                         value: vm.completedReports,
-                        color: Colors.green,
+                        color: AppColors.statusCompleted,
                         icon: Icons.check_circle,
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
                   // ── Tombol Navigasi ──
-                  ElevatedButton.icon(
+                  PrimaryButton(
+                    label: 'Kelola Semua Laporan',
+                    icon: Icons.list_alt,
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const AllReportsScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const AllReportsScreen(),
+                        ),
                       );
                     },
-                    icon: const Icon(Icons.list_alt),
-                    label: const Text('Kelola Semua Laporan'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 54),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const StatisticsScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.bar_chart_rounded),
+                    label: const Text('Lihat Statistik'),
                   ),
                 ],
               ),
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// Lencana kecil "Admin" — pembeda peran halus tanpa mengganti warna AppBar.
+class _AdminBadge extends StatelessWidget {
+  const _AdminBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.primaryTint,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        'Admin',
+        style: AppTextStyles.badge.copyWith(color: AppColors.primary),
       ),
     );
   }
@@ -128,27 +159,32 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radius + 4),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: color, size: 24),
+          Icon(icon, color: color, size: 28),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value.toString(),
-                style: AppTextStyles.heading.copyWith(color: color, fontSize: 24),
+                style:
+                    AppTextStyles.heading.copyWith(color: color, fontSize: 34),
               ),
+              const SizedBox(height: 2),
               Text(
                 label,
-                style: AppTextStyles.caption.copyWith(color: color, fontWeight: FontWeight.bold),
+                style: AppTextStyles.body.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
               ),
             ],
           ),

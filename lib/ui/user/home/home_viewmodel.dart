@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/model/user.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk tab Beranda (semua laporan + search).
 class HomeViewModel extends ChangeNotifier {
@@ -31,20 +33,36 @@ class HomeViewModel extends ChangeNotifier {
   String _searchQuery = '';
   String get searchQuery => _searchQuery;
 
+  ReportCategory? _categoryFilter;
+  ReportCategory? get categoryFilter => _categoryFilter;
+
   AppUser? _currentUser;
   AppUser? get currentUser => _currentUser;
 
   bool get isLoading => _status == ViewStatus.loading;
 
+  // ── Ringkasan "Kondisi Jalan di Area Anda" (dihitung dari semua laporan) ──
+  int get totalReports => _reports.length;
+  int get resolvedReports =>
+      _reports.where((r) => r.status == ReportStatus.completed).length;
+
+  /// Rasio laporan yang sudah selesai (0.0–1.0).
+  double get resolvedRatio =>
+      _reports.isEmpty ? 0 : resolvedReports / _reports.length;
+
   List<Report> get _filteredReports {
-    if (_searchQuery.isEmpty) return _reports;
-    final q = _searchQuery.toLowerCase();
-    return _reports
-        .where((r) =>
-            r.title.toLowerCase().contains(q) ||
-            r.address.toLowerCase().contains(q) ||
-            r.category.label.toLowerCase().contains(q))
-        .toList(growable: false);
+    Iterable<Report> list = _reports;
+    if (_categoryFilter != null) {
+      list = list.where((r) => r.category == _categoryFilter);
+    }
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      list = list.where((r) =>
+          r.title.toLowerCase().contains(q) ||
+          r.address.toLowerCase().contains(q) ||
+          r.category.label.toLowerCase().contains(q));
+    }
+    return list.toList(growable: false);
   }
 
   // ── Commands ───────────────────────────────────────────────────────
@@ -63,7 +81,7 @@ class HomeViewModel extends ChangeNotifier {
       _reports = await _reportRepository.getAllReports();
       _status = ViewStatus.success;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     }
     notifyListeners();
@@ -76,7 +94,7 @@ class HomeViewModel extends ChangeNotifier {
       _error = null;
       _status = ViewStatus.success;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     }
     notifyListeners();
@@ -88,10 +106,9 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
+  /// Set filter kategori (null = semua).
+  void setCategoryFilter(ReportCategory? category) {
+    _categoryFilter = category;
+    notifyListeners();
   }
 }

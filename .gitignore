@@ -28,6 +28,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.vscode/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
@@ -45,4 +46,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+/agent
 CLAUDE.md

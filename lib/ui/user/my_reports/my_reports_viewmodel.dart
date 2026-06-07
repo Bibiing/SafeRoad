@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk tab Laporan Saya.
 class MyReportsViewModel extends ChangeNotifier {
@@ -40,16 +41,10 @@ class MyReportsViewModel extends ChangeNotifier {
       _reports = await _reportRepository.getReportsByUser(uid);
       _status = ViewStatus.success;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     }
     notifyListeners();
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
-  }
 }

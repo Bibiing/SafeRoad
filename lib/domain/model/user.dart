@@ -12,6 +12,15 @@ class AppUser {
   final String? fcmToken;
   final DateTime createdAt;
 
+  /// Metode masuk: `'email'` atau `'google'`.
+  final String provider;
+
+  /// URL foto profil (mis. dari Google). `null` bila tidak ada.
+  final String? photoUrl;
+
+  /// Poin kontribusi akumulatif (Tahap 6). Default 0.
+  final int contributionPoints;
+
   const AppUser({
     required this.uid,
     required this.name,
@@ -19,6 +28,9 @@ class AppUser {
     this.role = UserRole.user,
     this.fcmToken,
     required this.createdAt,
+    this.provider = 'email',
+    this.photoUrl,
+    this.contributionPoints = 0,
   });
 
   /// Kembalikan salinan baru dengan field tertentu diganti.
@@ -29,6 +41,9 @@ class AppUser {
     UserRole? role,
     String? fcmToken,
     DateTime? createdAt,
+    String? provider,
+    String? photoUrl,
+    int? contributionPoints,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -37,11 +52,20 @@ class AppUser {
       role: role ?? this.role,
       fcmToken: fcmToken ?? this.fcmToken,
       createdAt: createdAt ?? this.createdAt,
+      provider: provider ?? this.provider,
+      photoUrl: photoUrl ?? this.photoUrl,
+      contributionPoints: contributionPoints ?? this.contributionPoints,
     );
   }
 
   /// Apakah user memiliki peran admin.
   bool get isAdmin => role == UserRole.admin;
+
+  /// Apakah user masuk lewat Google.
+  bool get isGoogleProvider => provider == 'google';
+
+  /// Label metode masuk untuk tampilan.
+  String get providerLabel => isGoogleProvider ? 'Google' : 'Email';
 
   @override
   String toString() => 'AppUser(uid=$uid, name=$name, role=${role.name})';

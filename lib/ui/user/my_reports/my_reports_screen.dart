@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../domain/model/report.dart';
@@ -51,37 +53,16 @@ class _MyReportsScreenState extends State<MyReportsScreen> {
               return const LoadingIndicator(message: 'Memuat laporan...');
             }
             if (vm.error != null) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(vm.error!, style: AppTextStyles.body),
-                    const SizedBox(height: 12),
-                    OutlinedButton(
-                      onPressed: () => vm.loadMyReports(),
-                      child: const Text('Coba Lagi'),
-                    ),
-                  ],
-                ),
+              return ErrorState(
+                message: vm.error!,
+                onRetry: () => vm.loadMyReports(),
               );
             }
             if (vm.reports.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.assignment_outlined,
-                        size: 64,
-                        color: AppColors.textHint.withValues(alpha: 0.5)),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Belum ada laporan.\nBuat laporan pertamamu!',
-                      style: AppTextStyles.body
-                          .copyWith(color: AppColors.textSecondary),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+              return const EmptyState(
+                icon: Icons.assignment_outlined,
+                title: 'Belum ada laporan.',
+                subtitle: 'Buat laporan pertamamu!',
               );
             }
             return RefreshIndicator(

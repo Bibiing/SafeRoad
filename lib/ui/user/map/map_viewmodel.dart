@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
 import '../../../domain/repository/report_repository.dart';
-import '../../auth/login/login_viewmodel.dart';
+import '../../../core/state/view_status.dart';
+import '../../../core/utils/error_mapper.dart';
 
 /// ViewModel untuk tab Peta.
 class MapViewModel extends ChangeNotifier {
@@ -18,6 +20,19 @@ class MapViewModel extends ChangeNotifier {
 
   List<Report> _reports = const [];
   List<Report> get reports => List.unmodifiable(_reports);
+
+  ReportCategory? _categoryFilter;
+  ReportCategory? get categoryFilter => _categoryFilter;
+
+  /// Laporan setelah filter kategori (null = semua/terdekat).
+  List<Report> get filteredReports => _categoryFilter == null
+      ? _reports
+      : _reports.where((r) => r.category == _categoryFilter).toList();
+
+  void setCategoryFilter(ReportCategory? category) {
+    _categoryFilter = category;
+    notifyListeners();
+  }
 
   bool get isLoading => _status == ViewStatus.loading;
 
@@ -47,16 +62,10 @@ class MapViewModel extends ChangeNotifier {
 
       _status = ViewStatus.success;
     } catch (e) {
-      _error = _extractMessage(e);
+      _error = mapErrorToMessage(e);
       _status = ViewStatus.failure;
     }
     notifyListeners();
   }
 
-  String _extractMessage(Object e) {
-    final text = e.toString();
-    return text.startsWith('Exception: ')
-        ? text.substring('Exception: '.length)
-        : text;
-  }
 }

@@ -17,6 +17,9 @@ abstract class ReportRemoteDataSource {
   /// Ambil laporan berdasarkan ID.
   Future<ReportDto?> getReportById(String id);
 
+  /// Stream realtime satu laporan (untuk layar detail).
+  Stream<ReportDto?> watchReport(String id);
+
   /// Ambil semua laporan milik [userId].
   Future<List<ReportDto>> getReportsByUser(String userId);
 
@@ -60,6 +63,15 @@ class FirestoreReportRemoteDataSource implements ReportRemoteDataSource {
     final data = doc.data();
     if (!doc.exists || data == null) return null;
     return ReportDto.fromFirestore(doc.id, data);
+  }
+
+  @override
+  Stream<ReportDto?> watchReport(String id) {
+    return _reports.doc(id).snapshots().map((doc) {
+      final data = doc.data();
+      if (!doc.exists || data == null) return null;
+      return ReportDto.fromFirestore(doc.id, data);
+    });
   }
 
   @override

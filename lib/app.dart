@@ -11,6 +11,7 @@ import 'ui/admin/dashboard/admin_dashboard_screen.dart';
 import 'ui/auth/login/login_screen.dart';
 import 'ui/splash/animated_splash_screen.dart';
 import 'ui/user/home/home_screen.dart';
+import 'ui/user/report_detail/report_detail_screen.dart';
 
 /// Widget root aplikasi SafeRoad.
 ///
@@ -71,11 +72,14 @@ class _AuthGateState extends State<AuthGate> {
 
   void _handleNotificationTap(String reportId) {
     debugPrint('AuthGate: notification tapped, reportId=$reportId');
-    // TODO (Alvin): navigasi ke halaman detail laporan user saat tap notif.
-    // Contoh navigasi:
-    // SafeRoadApp.navigatorKey.currentState?.push(
-    //   MaterialPageRoute(builder: (_) => ReportDetailScreen(reportId: reportId)),
-    // );
+    // Buka layar detail laporan terkait. ReportDetailScreen membaca
+    // ReportRepository & AuthRepository dari Provider yang berada di atas
+    // MaterialApp (lihat main.dart), sehingga aman dipush via navigatorKey.
+    SafeRoadApp.navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => ReportDetailScreen(reportId: reportId),
+      ),
+    );
   }
 
   @override

@@ -74,6 +74,19 @@ class Report {
   /// Apakah laporan masih bisa di-edit/hapus oleh user (hanya saat pending).
   bool get isEditable => status == ReportStatus.pending;
 
+  /// Alasan/catatan admin kanonik.
+  ///
+  /// Membaca [adminReason]; bila kosong, jatuh ke [rejectionReason] (field
+  /// lama/deprecated) demi kompatibilitas dokumen Firestore lama. Penulisan
+  /// baru hanya ke [adminReason] (tidak menulis ganda).
+  String? get effectiveAdminReason {
+    if (adminReason != null && adminReason!.isNotEmpty) return adminReason;
+    if (rejectionReason != null && rejectionReason!.isNotEmpty) {
+      return rejectionReason;
+    }
+    return null;
+  }
+
   @override
   String toString() => 'Report(id=$id, title=$title, status=${status.name})';
 }

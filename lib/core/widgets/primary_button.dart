@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_theme.dart';
 
 /// Tombol primer SafeRoad — hijau solid dengan loading state.
 class PrimaryButton extends StatelessWidget {
@@ -16,12 +17,16 @@ class PrimaryButton extends StatelessWidget {
   /// Ikon opsional di sebelah kiri label.
   final IconData? icon;
 
+  /// Tambahkan glow hijau lembut di belakang tombol (mis. layar auth).
+  final bool glow;
+
   const PrimaryButton({
     super.key,
     required this.label,
     this.onPressed,
     this.loading = false,
     this.icon,
+    this.glow = false,
   });
 
   @override
@@ -46,9 +51,25 @@ class PrimaryButton extends StatelessWidget {
               )
             : Text(label);
 
-    return ElevatedButton(
+    final button = ElevatedButton(
       onPressed: loading ? null : onPressed,
       child: child,
+    );
+
+    if (!glow) return button;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: button,
     );
   }
 }
