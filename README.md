@@ -374,6 +374,12 @@ notifications/{userId}/items/{notificationId}
     - oldStatus, newStatus, isRead, createdAt
 ```
 
+## Cara Running
+
+```bash
+flutter run --dart-define-from-file=secrets.json
+```
+
 ## Preview Aplikasi
 
 ### 1. Halaman Fitur User
