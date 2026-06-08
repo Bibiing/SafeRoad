@@ -237,6 +237,22 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+    // Foto profil Google hanya ditampilkan bila user login via Google dan
+    // memiliki photoUrl; selain itu (email/password atau Google tanpa foto)
+    // jatuh ke avatar inisial hijau.
+    final hasPhoto = user.isGoogleProvider && (user.photoUrl?.isNotEmpty ?? false);
+
+    Widget initialAvatar() => Container(
+          color: AppColors.primaryTint,
+          alignment: Alignment.center,
+          child: Text(
+            initial,
+            style: AppTextStyles.heading.copyWith(
+              fontSize: 38,
+              color: AppColors.primary,
+            ),
+          ),
+        );
 
     return Column(
       children: [
@@ -249,19 +265,32 @@ class _ProfileHeader extends StatelessWidget {
               Container(
                 width: 96,
                 height: 96,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: AppColors.primaryTint,
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.primary, width: 2),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  initial,
-                  style: AppTextStyles.heading.copyWith(
-                    fontSize: 38,
-                    color: AppColors.primary,
-                  ),
-                ),
+                child: hasPhoto
+                    ? Image.network(
+                        user.photoUrl!,
+                        width: 96,
+                        height: 96,
+                        fit: BoxFit.cover,
+                        // Placeholder inisial saat foto masih dimuat.
+                        loadingBuilder: (context, child, progress) =>
+                            progress == null ? child : initialAvatar(),
+                        // Fallback otomatis ke inisial bila gagal memuat (offline/URL rusak).
+                        errorBuilder: (_, _, _) => initialAvatar(),
+                      )
+                    : Text(
+                        initial,
+                        style: AppTextStyles.heading.copyWith(
+                          fontSize: 38,
+                          color: AppColors.primary,
+                        ),
+                      ),
               ),
               Positioned(
                 bottom: 0,
@@ -303,8 +332,6 @@ class _MethodRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Metode Masuk', style: AppTextStyles.caption),
-        const SizedBox(width: 10),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
@@ -316,6 +343,8 @@ class _MethodRow extends StatelessWidget {
             style: AppTextStyles.badge.copyWith(color: AppColors.primary),
           ),
         ),
+        const SizedBox(width: 10),
+        Text('Metode Masuk', style: AppTextStyles.caption),
         const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

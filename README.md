@@ -217,13 +217,14 @@ Fitur yang dapat digunakan warga sebagai pelapor:
 
 - **Registrasi dan Login:** Membuat akun dan masuk dengan email dan kata sandi, atau masuk cepat dengan akun Google (Google Sign-In), melalui Firebase Authentication.
 - **Membuat Laporan Kerusakan:** Memilih kategori (jalan berlubang, lampu jalan, rambu, marka, atau lainnya) dan menuliskan deskripsi; judul laporan dibentuk otomatis dari kategori dan alamat.
-- **Mengunggah Foto:** Melampirkan satu foto kerusakan yang disimpan di ImageKit.
+- **Mengunggah Foto:** Melampirkan hingga 5 foto kerusakan per laporan (dipilih satu per satu, bisa dihapus sebelum dikirim) yang disimpan di ImageKit.
 - **Deteksi Lokasi Otomatis:** Koordinat dan alamat lokasi diambil otomatis dari GPS perangkat (geolocator + geocoding), dengan pratinjau peta kecil di form.
 - **Melihat Laporan di Peta:** Seluruh laporan tampil sebagai marker berwarna sesuai status di Google Maps, lengkap dengan pencarian, filter kategori, dan kartu pratinjau berjarak.
 - **Mengelola Laporan (CRUD):** Mengubah atau menghapus laporan milik sendiri selama masih berstatus menunggu.
 - **Melacak Status Laporan:** Memantau perkembangan laporan dari menunggu hingga selesai, termasuk timeline riwayat status.
-- **Notifikasi:** Menerima notifikasi push (FCM) dan notifikasi dalam aplikasi setiap kali status laporan miliknya berubah, dengan badge jumlah belum dibaca.
-- **Profil dan Kontribusi:** Melihat profil berisi jumlah laporan dikirim, laporan selesai, dan poin kontribusi, lengkap dengan level, tier, dan achievement.
+- **Galeri Foto Laporan:** Melihat foto pada halaman detail sebagai slideshow yang bisa digeser (dengan indikator dan dot), lalu membukanya layar penuh dengan zoom (pinch-to-zoom) dan swipe antar foto.
+- **Notifikasi:** Menerima notifikasi push (FCM) dan notifikasi dalam aplikasi setiap kali status laporan miliknya berubah, dengan badge jumlah belum dibaca. Notifikasi tampil di notification center perangkat (system tray) termasuk saat aplikasi di background/tertutup, dan mengetuknya membuka halaman notifikasi di dalam aplikasi.
+- **Profil dan Kontribusi:** Melihat profil berisi jumlah laporan dikirim, laporan selesai, dan poin kontribusi, lengkap dengan level, tier, dan achievement. Bila masuk via Google, foto profil akun Google ditampilkan (dengan fallback ke avatar inisial).
 
 ### Admin Features (Nabil Julian Syah)
 
@@ -231,7 +232,7 @@ Fitur untuk administrator atau pengelola yang memvalidasi dan menindaklanjuti la
 
 - **Dasbor Admin:** Ringkasan jumlah laporan (Total, Menunggu, Diproses, Selesai) dengan akses cepat ke pengelolaan laporan dan statistik.
 - **Melihat Seluruh Laporan:** Menampilkan semua laporan dari seluruh pengguna dalam satu daftar dengan pencarian dan filter status.
-- **Memvalidasi dan Memperbarui Status:** Mengubah status laporan (verified, inProgress, completed, rejected) beserta catatan/alasan admin; perubahan dicatat ke riwayat status dan memicu notifikasi ke pelapor.
+- **Memvalidasi dan Memperbarui Status:** Mengubah status laporan (verified, inProgress, completed, rejected) melalui lembar pilihan (bottom sheet) berlabel status; alasan wajib diisi saat menolak. Perubahan beserta catatan/alasan admin dicatat ke riwayat status dan memicu notifikasi ke pelapor.
 - **Ekspor Data:** Mengekspor daftar laporan ke berkas CSV untuk dibagikan.
 
 ### Additional Features (Muhammad Khibban I'tishom)
@@ -242,6 +243,7 @@ Fitur pendukung yang meningkatkan pengalaman dan nilai analitik aplikasi:
 - **Sinkronisasi Realtime (halaman detail):** Status laporan pada halaman detail diperbarui langsung saat admin mengubahnya, tanpa refresh manual. Daftar (beranda/peta/laporan saya/kelola) memakai pull-to-refresh.
 - **Statistik Laporan:** Ringkasan jumlah laporan per status dan per kategori dalam bentuk bar proporsional.
 - **Sistem Poin, Level, dan Achievement:** Poin kontribusi diberikan atas aktivitas pelapor, dengan level dan achievement yang terbuka otomatis.
+- **Deteksi Offline:** Peringatan otomatis saat perangkat kehilangan koneksi internet, dengan opsi **Lanjutkan** (tetap memakai data yang sudah tampil) atau **Keluar**. Dialog tertutup otomatis dan muncul notifikasi singkat saat koneksi kembali tersedia.
 
 ### Beranda vs Laporan Saya
 
@@ -377,23 +379,41 @@ notifications/{userId}/items/{notificationId}
 ### 1. Halaman Fitur User
 
 <p align="center">
-   <img src="./assets/docs/image1.jpg" alt="Dokumentasi 1" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
-   <img src="./assets/docs/image2.jpg" alt="Dokumentasi 2" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
-   <img src="./assets/docs/image3.jpg" alt="Dokumentasi 3" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
-   <img src="./assets/docs/image4.jpg" alt="Dokumentasi 4" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
-   <img src="./assets/docs/image5.jpg" alt="Dokumentasi 5" width="19%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-login.jpeg" alt="Login — masuk email/password atau Google" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-register.jpeg" alt="Registrasi — daftar akun baru" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-home.jpeg" alt="Registrasi — daftar akun baru" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-create-report.jpeg" alt="Buat Laporan — pilih kategori, foto, dan lokasi" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-map.jpeg" alt="Peta — marker laporan dengan filter dan kartu pratinjau" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+</p>
+<p align="center">
+   <img src="./assets/docs/user-my-reports.jpeg" alt="Laporan Saya — daftar laporan milik pengguna" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-report-detail.jpeg" alt="Detail Laporan — slideshow foto dan status" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-report-detail-gallery.jpeg" alt="Detail Laporan — galeri foto dengan indikator halaman" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/user-report-history.jpeg" alt="Detail Laporan — riwayat perubahan status" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
 </p>
 
 ### 2. Halaman Fitur Admin
 
 <p align="center">
-
+   <img src="./assets/docs/admin-dashboard.jpeg" alt="Dasbor Admin — ringkasan statistik laporan" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/admin-all-reports.jpeg" alt="Manajemen Laporan — daftar semua laporan dengan filter" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/admin-change-status.jpeg" alt="Ubah Status — bottom sheet pilihan status" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/admin-change-status-rejected.jpeg" alt="Ubah Status — alasan penolakan wajib diisi" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
 </p>
 
 ### 3. Halaman Fitur Tambahan
 
 <p align="center">
-
+   <img src="./assets/docs/additional-splash.jpeg" alt="Splash Screen — logo dan tagline SafeRoad" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-notifications.jpeg" alt="Notifikasi — daftar pembaruan status laporan" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-statistics.jpeg" alt="Statistik Laporan — grafik per status dan kategori" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-push-notification.png" alt="Push Notification — notifikasi di system tray Android" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+</p>
+<p align="center">
+   <img src="./assets/docs/additional-profile.jpeg" alt="Profil — foto Google, level, dan poin kontribusi" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-profile-achievements.jpeg" alt="Profil — achievement dan menu bantuan" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-profile-help.jpeg" alt="Profil — dialog bantuan" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
+   <img src="./assets/docs/additional-profile-about.jpeg" alt="Profil — dialog tentang SafeRoad" width="24%" style="border: 2px solid #3A465A; border-radius: 8px;" />
 </p>
 
 ## Rencana Pengembangan

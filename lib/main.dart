@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'core/utils/local_notification_service.dart';
+import 'core/utils/push_notification_service.dart';
 import 'data/remote/auth_remote_datasource.dart';
 import 'data/remote/fcm_datasource.dart';
 import 'data/remote/location_datasource.dart';
@@ -34,6 +35,13 @@ Future<void> main() async {
   await initializeDateFormatting('id');
   await LocalNotificationService.initialize();
 
+  // ── FCM push handlers ──────────────────────────────────────────────
+  // Background/terminated handler harus didaftarkan sebelum runApp; handler
+  // foreground & "dibuka dari notifikasi" menampilkan notifikasi sistem dan
+  // memicu deep link ke halaman notifikasi (callback di-set oleh AuthGate).
+  PushNotificationService.registerBackgroundHandler();
+  PushNotificationService.initForegroundHandlers();
+
   // ── DataSource ─────────────────────────────────────────────────────
   final authDataSource = FirebaseAuthRemoteDataSource();
   final reportDataSource = FirestoreReportRemoteDataSource();
@@ -60,6 +68,8 @@ Future<void> main() async {
     try {
       await notificationRepository.initialize();
       final token = await notificationRepository.getToken();
+      // Token dicetak agar mudah dipakai untuk uji kirim dari Firebase Console.
+      debugPrint('FCM token: $token');
       final uid = authRepository.currentUserId;
       if (uid != null && token != null) {
         await authRepository.updateFcmToken(uid: uid, token: token);

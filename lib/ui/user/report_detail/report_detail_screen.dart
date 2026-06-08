@@ -123,23 +123,9 @@ class _DetailBody extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Foto ──
+          // ── Foto (slideshow + full screen) ──
           if (report.imageUrls.isNotEmpty) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                report.imageUrls.first,
-                height: 220,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 220,
-                  color: AppColors.primaryTint,
-                  child: const Icon(Icons.broken_image,
-                      size: 48, color: AppColors.textHint),
-                ),
-              ),
-            ),
+            _PhotoSlideshow(imageUrls: report.imageUrls),
             const SizedBox(height: 16),
           ],
 
@@ -328,6 +314,265 @@ class _StatusTimeline extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+/// Slideshow foto laporan: [PageView] horizontal yang bisa diswipe, dengan
+/// indikator "x/total" dan dot indicator. Tap foto → galeri full screen.
+class _PhotoSlideshow extends StatefulWidget {
+  final List<String> imageUrls;
+
+  const _PhotoSlideshow({required this.imageUrls});
+
+  @override
+  State<_PhotoSlideshow> createState() => _PhotoSlideshowState();
+}
+
+class _PhotoSlideshowState extends State<_PhotoSlideshow> {
+  final _controller = PageController();
+  int _index = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _openFullscreen(int index) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black,
+        pageBuilder: (_, _, _) => _FullscreenGallery(
+          imageUrls: widget.imageUrls,
+          initialIndex: index,
+        ),
+        transitionsBuilder: (_, animation, _, child) =>
+            FadeTransition(opacity: animation, child: child),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final urls = widget.imageUrls;
+    final multiple = urls.length > 1;
+
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            height: 240,
+            width: double.infinity,
+            child: Stack(
+              children: [
+                PageView.builder(
+                  controller: _controller,
+                  itemCount: urls.length,
+                  onPageChanged: (i) => setState(() => _index = i),
+                  itemBuilder: (context, i) => GestureDetector(
+                    onTap: () => _openFullscreen(i),
+                    child: Image.network(
+                      urls[i],
+                      width: double.infinity,
+                      height: 240,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Container(
+                          color: AppColors.primaryTint,
+                          child: const Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (_, _, _) => Container(
+                        color: AppColors.primaryTint,
+                        child: const Icon(Icons.broken_image,
+                            size: 48, color: AppColors.textHint),
+                      ),
+                    ),
+                  ),
+                ),
+                if (multiple)
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: _PhotoCounterBadge(
+                      current: _index + 1,
+                      total: urls.length,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        if (multiple) ...[
+          const SizedBox(height: 10),
+          _DotsIndicator(count: urls.length, activeIndex: _index),
+        ],
+      ],
+    );
+  }
+}
+
+/// Badge "x/total" putih di atas latar gelap transparan.
+class _PhotoCounterBadge extends StatelessWidget {
+  final int current;
+  final int total;
+
+  const _PhotoCounterBadge({required this.current, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        '$current/$total',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+/// Dot indicator di bawah slideshow; dot aktif memanjang berwarna primer.
+class _DotsIndicator extends StatelessWidget {
+  final int count;
+  final int activeIndex;
+
+  const _DotsIndicator({required this.count, required this.activeIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (i) {
+        final active = i == activeIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: active ? 18 : 7,
+          height: 7,
+          decoration: BoxDecoration(
+            color: active ? AppColors.primary : AppColors.border,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+/// Galeri foto full screen: pinch-to-zoom ([InteractiveViewer]) + swipe
+/// ([PageView]) antar foto, dibuka pada indeks yang di-tap.
+class _FullscreenGallery extends StatefulWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+
+  const _FullscreenGallery({
+    required this.imageUrls,
+    required this.initialIndex,
+  });
+
+  @override
+  State<_FullscreenGallery> createState() => _FullscreenGalleryState();
+}
+
+class _FullscreenGalleryState extends State<_FullscreenGallery> {
+  late final PageController _controller;
+  late int _index;
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.initialIndex;
+    _controller = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final urls = widget.imageUrls;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _controller,
+            itemCount: urls.length,
+            onPageChanged: (i) => setState(() => _index = i),
+            itemBuilder: (context, i) => InteractiveViewer(
+              minScale: 1,
+              maxScale: 4,
+              child: Center(
+                child: Image.network(
+                  urls[i],
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) => const Icon(
+                    Icons.broken_image_outlined,
+                    color: Colors.white54,
+                    size: 64,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  style: IconButton.styleFrom(backgroundColor: Colors.black45),
+                ),
+              ),
+            ),
+          ),
+          if (urls.length > 1)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Center(
+                    child: _PhotoCounterBadge(
+                      current: _index + 1,
+                      total: urls.length,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

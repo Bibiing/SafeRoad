@@ -12,8 +12,8 @@ class AppConstants {
   /// Kualitas kompresi foto (0–100).
   static const int imageQuality = 70;
 
-  /// Maksimum jumlah foto per laporan (dibatasi 1 foto per laporan).
-  static const int maxReportPhotos = 1;
+  /// Maksimum jumlah foto per laporan.
+  static const int maxReportPhotos = 5;
 
   /// OAuth 2.0 **Web client ID** (server client ID) untuk Google Sign-In.
   ///

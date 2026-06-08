@@ -47,6 +47,9 @@ dependencies:
   # Network & Env
   dio: ^5.7.0
 
+  # Deteksi koneksi internet (untuk peringatan offline)
+  connectivity_plus: ^7.1.1
+
   # Export & Sharing
   csv: ^6.0.0
   path_provider: ^2.1.3

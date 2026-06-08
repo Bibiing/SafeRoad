@@ -158,9 +158,30 @@ class FirebaseAuthRemoteDataSource implements AuthRemoteDataSource {
     final user = cred.user!;
     final uid = user.uid;
 
-    // Pertahankan profil lama (termasuk poin) bila sudah ada.
+    // Pertahankan profil lama (termasuk poin) bila sudah ada. Namun segarkan
+    // photoUrl bila Google mengirim foto baru/berubah, agar foto profil tetap
+    // sinkron (termasuk untuk akun lama yang dibuat sebelum field ini ada).
     final existing = await fetchUser(uid);
-    if (existing != null) return existing;
+    if (existing != null) {
+      final freshPhoto = user.photoURL;
+      if (freshPhoto != null &&
+          freshPhoto.isNotEmpty &&
+          freshPhoto != existing.photoUrl) {
+        await _users.doc(uid).update({'photoUrl': freshPhoto});
+        return UserDto(
+          uid: existing.uid,
+          name: existing.name,
+          email: existing.email,
+          role: existing.role,
+          fcmToken: existing.fcmToken,
+          createdAt: existing.createdAt,
+          provider: existing.provider,
+          photoUrl: freshPhoto,
+          contributionPoints: existing.contributionPoints,
+        );
+      }
+      return existing;
+    }
 
     final dto = UserDto(
       uid: uid,

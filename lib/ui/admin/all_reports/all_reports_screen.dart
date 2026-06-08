@@ -8,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/status_pill.dart';
 import '../../../domain/model/enums.dart';
 import '../../../domain/model/report.dart';
@@ -313,33 +314,27 @@ class _ReportCard extends StatelessWidget {
             ],
 
             const SizedBox(height: 16),
-            PopupMenuButton<ReportStatus>(
-              onSelected: (newStatus) =>
-                  _handleStatusChange(context, vm, newStatus),
-              itemBuilder: (context) => ReportStatus.values.map((s) {
-                return PopupMenuItem(value: s, child: Text(s.label));
-              }).toList(),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(AppTheme.radius),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Ubah Status',
-                      style: AppTextStyles.button,
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      color: AppColors.onPrimary,
-                      size: 20,
-                    ),
-                  ],
+            Material(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(AppTheme.radius),
+              child: InkWell(
+                onTap: () => _openStatusSheet(context, vm),
+                borderRadius: BorderRadius.circular(AppTheme.radius),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Ubah Status', style: AppTextStyles.button),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.onPrimary,
+                        size: 20,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -363,29 +358,192 @@ class _ReportCard extends StatelessWidget {
     );
   }
 
-  Future<void> _handleStatusChange(
+  Future<void> _openStatusSheet(
     BuildContext context,
     AllReportsViewModel vm,
-    ReportStatus newStatus,
   ) async {
-    String? reason;
+    final result = await showModalBottomSheet<_StatusChangeResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _StatusChangeSheet(report: report),
+    );
+    if (result == null) return;
 
-    // Minta alasan bila ditolak atau butuh keterangan tambahan.
-    if (newStatus == ReportStatus.rejected ||
-        newStatus == ReportStatus.inProgress) {
-      reason = await showDialog<String>(
-        context: context,
-        builder: (context) => _ReasonDialog(status: newStatus),
-      );
-      if (reason == null) return; // User membatalkan dialog.
-    }
-
-    final ok = await vm.updateStatus(report, newStatus, reason: reason);
+    final ok = await vm.updateStatus(
+      report,
+      result.status,
+      reason: result.reason,
+    );
     if (context.mounted && !ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(vm.error ?? 'Gagal memperbarui status')),
       );
     }
+  }
+}
+
+/// Hasil pemilihan status dari [_StatusChangeSheet].
+class _StatusChangeResult {
+  final ReportStatus status;
+  final String? reason;
+
+  const _StatusChangeResult(this.status, this.reason);
+}
+
+/// Bottom sheet "Ubah Status Laporan" — konsisten dengan sistem hijau SafeRoad.
+///
+/// Menampilkan pilihan status (pending dikecualikan) sebagai daftar [ListTile]
+/// dengan [StatusPill]. Bila `rejected` dipilih, alasan penolakan wajib diisi.
+class _StatusChangeSheet extends StatefulWidget {
+  final Report report;
+
+  const _StatusChangeSheet({required this.report});
+
+  @override
+  State<_StatusChangeSheet> createState() => _StatusChangeSheetState();
+}
+
+class _StatusChangeSheetState extends State<_StatusChangeSheet> {
+  // Admin tidak mengembalikan laporan ke pending → dikecualikan dari pilihan.
+  static const _options = [
+    ReportStatus.verified,
+    ReportStatus.inProgress,
+    ReportStatus.completed,
+    ReportStatus.rejected,
+  ];
+
+  ReportStatus? _selected;
+  final _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  bool get _canSave {
+    if (_selected == null) return false;
+    // Alasan wajib diisi saat menolak laporan.
+    if (_selected == ReportStatus.rejected) {
+      return _reasonController.text.trim().isNotEmpty;
+    }
+    return true;
+  }
+
+  void _confirm() {
+    final selected = _selected;
+    if (selected == null) return;
+    final reason = _reasonController.text.trim();
+    Navigator.of(context).pop(
+      _StatusChangeResult(selected, reason.isEmpty ? null : reason),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRejected = _selected == ReportStatus.rejected;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('Ubah Status Laporan', style: AppTextStyles.title),
+            const SizedBox(height: 4),
+            Text(
+              widget.report.title,
+              style: AppTextStyles.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 16),
+            ..._options.map((s) {
+              final selected = _selected == s;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Material(
+                  color: selected ? AppColors.primaryTint : AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.radius),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppTheme.radius),
+                    onTap: () => setState(() => _selected = s),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(AppTheme.radius),
+                        border: Border.all(
+                          color:
+                              selected ? AppColors.primary : AppColors.border,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          StatusPill(status: s),
+                          const Spacer(),
+                          Icon(
+                            selected
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            color: selected
+                                ? AppColors.primary
+                                : AppColors.textHint,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+            if (isRejected) ...[
+              const SizedBox(height: 8),
+              Text('Alasan Penolakan', style: AppTextStyles.caption),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _reasonController,
+                maxLines: 3,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  hintText: 'Wajib diisi: jelaskan alasan penolakan...',
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Batal'),
+            ),
+            const SizedBox(height: 10),
+            PrimaryButton(
+              label: 'Simpan',
+              onPressed: _canSave ? _confirm : null,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -473,48 +631,3 @@ class _ImageViewerDialogState extends State<_ImageViewerDialog> {
   }
 }
 
-class _ReasonDialog extends StatefulWidget {
-  final ReportStatus status;
-  const _ReasonDialog({required this.status});
-
-  @override
-  State<_ReasonDialog> createState() => _ReasonDialogState();
-}
-
-class _ReasonDialogState extends State<_ReasonDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        widget.status == ReportStatus.rejected
-            ? 'Alasan Penolakan'
-            : 'Catatan Proses',
-      ),
-      content: TextField(
-        controller: _controller,
-        decoration: const InputDecoration(
-          hintText: 'Tulis keterangan di sini...',
-        ),
-        maxLines: 3,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: const Text('Simpan'),
-        ),
-      ],
-    );
-  }
-}

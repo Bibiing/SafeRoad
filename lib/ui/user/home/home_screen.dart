@@ -219,16 +219,48 @@ class _GreetingHeader extends StatelessWidget {
     final notifRepo = context.read<NotificationRepository>();
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Halo, $firstName!', style: AppTextStyles.heading),
-              const SizedBox(height: 2),
-              Text(
-                'Apa yang ingin kamu laporkan hari ini?',
-                style: AppTextStyles.caption,
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/images/logo-saferoad.png',
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'SafeRoad',
+                    style: AppTextStyles.title.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              RichText(
+                text: TextSpan(
+                  style: AppTextStyles.body.copyWith(fontSize: 14),
+                  children: [
+                    TextSpan(
+                      text: 'Halo, $firstName! ',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const TextSpan(
+                      text: 'Apa yang ingin kamu laporkan hari ini?',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

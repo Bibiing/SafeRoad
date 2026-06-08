@@ -358,7 +358,9 @@ class _CategoryGrid extends StatelessWidget {
   }
 }
 
-/// Area unggah foto (maks N) + thumbnail dengan tombol hapus.
+/// Area unggah foto (maks N): baris thumbnail horizontal scrollable +
+/// tombol "Tambah Foto" yang otomatis tersembunyi saat penuh, dengan
+/// counter "x/N foto".
 class _PhotoPicker extends StatelessWidget {
   final List<File> images;
   final int max;
@@ -378,73 +380,128 @@ class _PhotoPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (!isFull)
-          GestureDetector(
-            onTap: onAdd,
-            child: Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.primaryTint.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.add_a_photo_outlined,
-                      color: AppColors.primary, size: 30),
-                  const SizedBox(height: 8),
-                  Text('Tap untuk unggah foto', style: AppTextStyles.subtitle),
-                  const SizedBox(height: 2),
-                  Text(
-                    max == 1 ? 'Hanya 1 foto' : 'Maksimal $max foto',
-                    style: AppTextStyles.caption,
-                  ),
-                ],
+        SizedBox(
+          height: 84,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: images.length + (isFull ? 0 : 1),
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              if (i >= images.length) return _AddPhotoTile(onTap: onAdd);
+              return _PhotoThumb(file: images[i], onRemove: () => onRemove(i));
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            if (isFull)
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle,
+                        size: 14, color: AppColors.primary),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        'Maksimal $max foto tercapai',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              const Spacer(),
+            Text('${images.length}/$max foto', style: AppTextStyles.caption),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Thumbnail 80×80 satu foto terpilih dengan tombol hapus (×) di pojok.
+class _PhotoThumb extends StatelessWidget {
+  final File file;
+  final VoidCallback onRemove;
+
+  const _PhotoThumb({required this.file, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.file(
+              file,
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: onRemove,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: AppColors.error,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 14),
               ),
             ),
           ),
-        if (images.isNotEmpty) ...[
-          if (!isFull) const SizedBox(height: 12),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: List.generate(images.length, (i) {
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      images[i],
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    top: -6,
-                    right: -6,
-                    child: GestureDetector(
-                      onTap: () => onRemove(i),
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: AppColors.error,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.close,
-                            color: Colors.white, size: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ),
         ],
-      ],
+      ),
+    );
+  }
+}
+
+/// Kotak "Tambah Foto" 80×80 di ujung baris thumbnail.
+class _AddPhotoTile extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AddPhotoTile({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          color: AppColors.primaryTint.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add_a_photo_outlined,
+                color: AppColors.primary, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              'Tambah',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
