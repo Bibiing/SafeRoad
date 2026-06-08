@@ -240,6 +240,60 @@ class _ReportCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(report.address, style: AppTextStyles.caption),
 
+            // ── Galeri foto dari pelapor ──
+            if (report.imageUrls.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 90,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: report.imageUrls.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, i) {
+                    return GestureDetector(
+                      onTap: () => _showImageViewer(context, report.imageUrls, i),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          report.imageUrls[i],
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return Container(
+                              width: 90,
+                              height: 90,
+                              color: AppColors.background,
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (_, _, _) => Container(
+                            width: 90,
+                            height: 90,
+                            color: AppColors.background,
+                            child: const Icon(
+                              Icons.broken_image_outlined,
+                              color: AppColors.textHint,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+
             // Tampilkan alasan admin jika ada.
             if (report.effectiveAdminReason != null) ...[
               const SizedBox(height: 12),
@@ -295,6 +349,20 @@ class _ReportCard extends StatelessWidget {
     );
   }
 
+  void _showImageViewer(
+    BuildContext context,
+    List<String> urls,
+    int initialIndex,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => _ImageViewerDialog(
+        urls: urls,
+        initialIndex: initialIndex,
+      ),
+    );
+  }
+
   Future<void> _handleStatusChange(
     BuildContext context,
     AllReportsViewModel vm,
@@ -318,6 +386,90 @@ class _ReportCard extends StatelessWidget {
         SnackBar(content: Text(vm.error ?? 'Gagal memperbarui status')),
       );
     }
+  }
+}
+
+/// Dialog fullscreen viewer untuk foto laporan dengan swipe horizontal.
+class _ImageViewerDialog extends StatefulWidget {
+  final List<String> urls;
+  final int initialIndex;
+
+  const _ImageViewerDialog({
+    required this.urls,
+    required this.initialIndex,
+  });
+
+  @override
+  State<_ImageViewerDialog> createState() => _ImageViewerDialogState();
+}
+
+class _ImageViewerDialogState extends State<_ImageViewerDialog> {
+  late final PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.black,
+      insetPadding: EdgeInsets.zero,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.urls.length,
+            onPageChanged: (i) => setState(() => _currentIndex = i),
+            itemBuilder: (context, i) => InteractiveViewer(
+              child: Center(
+                child: Image.network(
+                  widget.urls[i],
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) => const Center(
+                    child: Icon(Icons.broken_image_outlined,
+                        color: Colors.white54, size: 64),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.close, color: Colors.white),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.black45,
+              ),
+            ),
+          ),
+          if (widget.urls.length > 1)
+            Positioned(
+              bottom: 12,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Text(
+                  '${_currentIndex + 1} / ${widget.urls.length}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 

@@ -19,8 +19,8 @@ abstract class StorageRemoteDataSource {
 class ImageKitStorageRemoteDataSource implements StorageRemoteDataSource {
   final Dio _dio;
 
-  // PERINGATAN KEAMANAN: Hardcoding private key tidak disarankan untuk aplikasi produksi.
-  static const String _imagekitPrivate = 'private_NtsRjvnsMvPyBC0fM0iw2oWEcyA=';
+  static const String _imagekitPrivate =
+      String.fromEnvironment('IMAGEKIT_PRIVATE_KEY');
 
   ImageKitStorageRemoteDataSource({Dio? dio}) : _dio = dio ?? Dio();
 
@@ -29,6 +29,13 @@ class ImageKitStorageRemoteDataSource implements StorageRemoteDataSource {
     required String path,
     required File file,
   }) async {
+    if (_imagekitPrivate.isEmpty) {
+      throw StateError(
+        'IMAGEKIT_PRIVATE_KEY belum diset. Jalankan Flutter dengan '
+        '--dart-define-from-file=secrets.json.',
+      );
+    }
+
     // ImageKit menggunakan Basic Auth dengan Private Key sebagai username dan password kosong.
     final String auth = 'Basic ${base64Encode(utf8.encode('$_imagekitPrivate:'))}';
 

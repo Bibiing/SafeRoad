@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -17,7 +18,7 @@ import '../../../domain/repository/report_repository.dart';
 import '../report_detail/report_detail_screen.dart';
 import 'map_viewmodel.dart';
 
-/// Tab Peta — Google Maps dengan marker semua laporan, filter, dan carousel.
+/// Tab Peta — OpenStreetMap dengan marker semua laporan, filter, dan carousel.
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -27,7 +28,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late final MapViewModel _vm;
-  GoogleMapController? _mapController;
+  final MapController _mapController = MapController();
   String _query = '';
 
   @override
@@ -40,52 +41,52 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     _vm.dispose();
-    _mapController?.dispose();
+    _mapController.dispose();
     super.dispose();
   }
 
-  double _hueFromStatus(ReportStatus status) {
+  Color _colorFromStatus(ReportStatus status) {
     switch (status) {
       case ReportStatus.completed:
-        return BitmapDescriptor.hueGreen;
+        return Colors.green;
       case ReportStatus.verified:
-        return BitmapDescriptor.hueAzure;
+        return Colors.lightBlue;
       case ReportStatus.inProgress:
-        return BitmapDescriptor.hueOrange;
+        return Colors.orange;
       case ReportStatus.rejected:
-        return BitmapDescriptor.hueRed;
+        return Colors.red;
       case ReportStatus.pending:
-        return BitmapDescriptor.hueYellow;
+        return Colors.amber.shade700;
     }
   }
 
-  Set<Marker> _buildMarkers(List<Report> reports) {
+  List<Marker> _buildMarkers(List<Report> reports) {
     return reports.map((report) {
       return Marker(
-        markerId: MarkerId(report.id),
-        position: LatLng(report.latitude, report.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(_hueFromStatus(report.status)),
-        onTap: () => _focusReport(report),
+        point: LatLng(report.latitude, report.longitude),
+        width: 40,
+        height: 40,
+        child: GestureDetector(
+          onTap: () => _focusReport(report),
+          child: Icon(
+            Icons.location_pin,
+            color: _colorFromStatus(report.status),
+            size: 36,
+          ),
+        ),
       );
-    }).toSet();
+    }).toList();
   }
 
   void _focusReport(Report report) {
-    _mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(
-        LatLng(report.latitude, report.longitude),
-        16,
-      ),
-    );
+    _mapController.move(LatLng(report.latitude, report.longitude), 16);
   }
 
-  Future<void> _goToMyLocation() async {
+  void _goToMyLocation() {
     final lat = _vm.currentLat;
     final lng = _vm.currentLng;
     if (lat != null && lng != null) {
-      await _mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15),
-      );
+      _mapController.move(LatLng(lat, lng), 15);
     }
   }
 
@@ -128,18 +129,41 @@ class _MapScreenState extends State<MapScreen> {
 
             return Stack(
               children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(initialLat, initialLng),
-                    zoom: 12,
+                FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: LatLng(initialLat, initialLng),
+                    initialZoom: 12,
                   ),
-                  markers: _buildMarkers(visible),
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                  padding: const EdgeInsets.only(top: 132, bottom: 150),
-                  onMapCreated: (controller) => _mapController = controller,
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.saferoad',
+                    ),
+                    MarkerLayer(markers: _buildMarkers(visible)),
+                    if (vm.currentLat != null && vm.currentLng != null)
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: LatLng(vm.currentLat!, vm.currentLng!),
+                            width: 20,
+                            height: 20,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: Colors.white, width: 2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SimpleAttributionWidget(
+                      source: Text('© OpenStreetMap contributors'),
+                    ),
+                  ],
                 ),
 
                 // ── Search + filter chips (atas) ──

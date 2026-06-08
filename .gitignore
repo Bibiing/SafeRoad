@@ -48,3 +48,9 @@ app.*.map.json
 
 /agent
 CLAUDE.md
+
+# Local build secrets. Use secrets.example.json as the template.
+secrets.json
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+android/app/google-services.json.v1

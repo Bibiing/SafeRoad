@@ -49,7 +49,10 @@ Future<void> main() async {
     storageDataSource: storageDataSource,
     locationDataSource: locationDataSource,
   );
-  final notificationRepository = NotificationRepositoryImpl(fcmDataSource, notifDataSource);
+  final notificationRepository = NotificationRepositoryImpl(
+    fcmDataSource,
+    notifDataSource,
+  );
 
   // ── Inisialisasi FCM (Non-blocking) ──────────────────────────────
   // Dilakukan secara asinkron agar tidak menghambat startup bila FIS/FCM bermasalah.

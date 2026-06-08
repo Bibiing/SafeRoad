@@ -1,11 +1,23 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+val secretsFile = rootProject.file("../secrets.json")
+val secrets = if (secretsFile.exists()) {
+    @Suppress("UNCHECKED_CAST")
+    JsonSlurper().parse(secretsFile) as Map<String, Any?>
+} else {
+    emptyMap()
+}
+
+fun secret(name: String): String =
+    (secrets[name] as? String)
+        ?: providers.environmentVariable(name).orNull
+        ?: ""
 
 android {
     namespace = "com.example.saferoad"
@@ -34,9 +46,9 @@ android {
         // checked into the repo, so every teammate gets the same SHA-1/256.
         getByName("debug") {
             storeFile = file("../debug.keystore")
-            storePassword = "android"
+            storePassword = secret("ANDROID_KEYSTORE_STORE_PASSWORD")
             keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            keyPassword = secret("ANDROID_KEYSTORE_KEY_PASSWORD")
         }
     }
 

@@ -2,10 +2,10 @@
 
 ## Anggota Kelompok
 
-| NRP | Nama | Kelas | Role |
-| :--- | :--- | :--- | :--- |
-| 5025231023 | Nabil Julian Syah | Mobile Programming (E) | Admin Features |
-| 5025231064 | Alvin Zanua Putra | Mobile Programming (E) | User Features |
+| NRP        | Nama                      | Kelas                  | Role                |
+| :--------- | :------------------------ | :--------------------- | :------------------ |
+| 5025231023 | Nabil Julian Syah         | Mobile Programming (E) | Admin Features      |
+| 5025231064 | Alvin Zanua Putra         | Mobile Programming (E) | User Features       |
 | 5025231126 | Muhammad Khibban I'tishom | Mobile Programming (E) | Additional Features |
 
 ## Deskripsi Aplikasi
@@ -19,7 +19,7 @@ Pengguna dapat masuk menggunakan email dan kata sandi atau melalui akun Google (
 1. **SDG 9 (Industry, Innovation and Infrastructure)**
 2. **SDG 11 (Sustainable Cities and Communities)**
 
-    Kedua SDGs tersebut mendukung aplikasi ini dengan mendorong partisipasi warga dalam pemeliharaan infrastruktur publik dan membantu pengelola kota membuat keputusan perbaikan berdasarkan data laporan yang nyata.
+   Kedua SDGs tersebut mendukung aplikasi ini dengan mendorong partisipasi warga dalam pemeliharaan infrastruktur publik dan membantu pengelola kota membuat keputusan perbaikan berdasarkan data laporan yang nyata.
 
 ## Arsitektur
 
@@ -254,11 +254,11 @@ Poin kontribusi diberikan otomatis atas aktivitas pelapor dan diakumulasi ke fie
 
 **Cara mendapatkan poin**
 
-| Aksi | Poin | Diberikan kepada |
-| :--- | :--- | :--- |
-| Membuat laporan baru | +10 | Pembuat laporan |
-| Laporan diverifikasi admin | +5 | Pemilik laporan |
-| Laporan selesai (status `completed`) | +25 | Pemilik laporan |
+| Aksi                                 | Poin | Diberikan kepada |
+| :----------------------------------- | :--- | :--------------- |
+| Membuat laporan baru                 | +10  | Pembuat laporan  |
+| Laporan diverifikasi admin           | +5   | Pemilik laporan  |
+| Laporan selesai (status `completed`) | +25  | Pemilik laporan  |
 
 Poin dari admin hanya ditambahkan saat status benar-benar berubah, dan bersifat best-effort (kegagalan menambah poin tidak menggagalkan pembaruan status laporan).
 
@@ -266,11 +266,11 @@ Poin dari admin hanya ditambahkan saat status benar-benar berubah, dan bersifat 
 
 Setiap **100 poin** menaikkan 1 level, dengan level minimum 1. Rumusnya: `level = (poin / 100) + 1` (pembagian bulat).
 
-| Tier | Level | Rentang poin |
-| :--- | :--- | :--- |
-| Pemula | 1-2 | 0-199 |
-| Kontributor | 3-4 | 200-399 |
-| Pro Reporter | 5+ | 400+ |
+| Tier         | Level | Rentang poin |
+| :----------- | :---- | :----------- |
+| Pemula       | 1-2   | 0-199        |
+| Kontributor  | 3-4   | 200-399      |
+| Pro Reporter | 5+    | 400+         |
 
 Contoh: 0 poin = Level 1, 100 poin = Level 2, 250 poin = Level 3, 400 poin = Level 5.
 
@@ -278,45 +278,45 @@ Contoh: 0 poin = Level 1, 100 poin = Level 2, 250 poin = Level 3, 400 poin = Lev
 
 Achievement terbuka otomatis ketika syaratnya terpenuhi:
 
-| Achievement | Syarat |
-| :--- | :--- |
-| Laporan Pertama | Kirim 1 laporan |
-| Pelapor Aktif | Kirim 10 laporan |
-| Penyelesai | 5 laporan selesai |
-| Centurion | Kumpulkan 100 poin |
-| Pro Reporter | Capai Level 5 (400 poin) |
-| Pahlawan Jalan | Kumpulkan 500 poin |
+| Achievement     | Syarat                   |
+| :-------------- | :----------------------- |
+| Laporan Pertama | Kirim 1 laporan          |
+| Pelapor Aktif   | Kirim 10 laporan         |
+| Penyelesai      | 5 laporan selesai        |
+| Centurion       | Kumpulkan 100 poin       |
+| Pro Reporter    | Capai Level 5 (400 poin) |
+| Pahlawan Jalan  | Kumpulkan 500 poin       |
 
 ## Alur Status Laporan
 
 Setiap laporan melewati alur status berikut, yang dikelola oleh administrator dan dipantau oleh pelapor. Nilai enum dan label diambil dari `domain/model/enums.dart`.
 
-| Nilai (enum) | Label | Keterangan |
-| :--- | :--- | :--- |
-| `pending` | Menunggu | Laporan baru dikirim warga, menunggu pemeriksaan admin. |
-| `verified` | Diverifikasi | Laporan telah diperiksa dan dinyatakan sah oleh admin. |
-| `inProgress` | Diproses | Perbaikan terhadap kerusakan sedang berlangsung. |
-| `completed` | Selesai | Kerusakan telah selesai diperbaiki. |
-| `rejected` | Ditolak | Laporan ditolak karena tidak valid, duplikat, atau tidak relevan. |
+| Nilai (enum) | Label        | Keterangan                                                        |
+| :----------- | :----------- | :---------------------------------------------------------------- |
+| `pending`    | Menunggu     | Laporan baru dikirim warga, menunggu pemeriksaan admin.           |
+| `verified`   | Diverifikasi | Laporan telah diperiksa dan dinyatakan sah oleh admin.            |
+| `inProgress` | Diproses     | Perbaikan terhadap kerusakan sedang berlangsung.                  |
+| `completed`  | Selesai      | Kerusakan telah selesai diperbaiki.                               |
+| `rejected`   | Ditolak      | Laporan ditolak karena tidak valid, duplikat, atau tidak relevan. |
 
 ## Teknologi Stak yang Digunakan
 
-| Kategori | Teknologi |
-| :--- | :--- |
-| Framework | Flutter |
-| State management | provider |
-| Autentikasi | firebase_auth, google_sign_in |
-| Basis data | cloud_firestore |
-| Penyimpanan foto | ImageKit (via dio) |
-| Notifikasi | firebase_messaging, flutter_local_notifications |
-| Peta | google_maps_flutter |
-| Lokasi dan alamat | geolocator, geocoding |
-| Kamera dan galeri | image_picker |
-| Tipografi | google_fonts (Plus Jakarta Sans) |
-| Animasi | flutter_animate |
-| Format tanggal dan angka | intl |
-| Ekspor dan berbagi | csv, path_provider, share_plus |
-| Inti Firebase | firebase_core |
+| Kategori                 | Teknologi                                       |
+| :----------------------- | :---------------------------------------------- |
+| Framework                | Flutter                                         |
+| State management         | provider                                        |
+| Autentikasi              | firebase_auth, google_sign_in                   |
+| Basis data               | cloud_firestore                                 |
+| Penyimpanan foto         | ImageKit (via dio)                              |
+| Notifikasi               | firebase_messaging, flutter_local_notifications |
+| Peta                     | google_maps_flutter                             |
+| Lokasi dan alamat        | geolocator, geocoding                           |
+| Kamera dan galeri        | image_picker                                    |
+| Tipografi                | google_fonts (Plus Jakarta Sans)                |
+| Animasi                  | flutter_animate                                 |
+| Format tanggal dan angka | intl                                            |
+| Ekspor dan berbagi       | csv, path_provider, share_plus                  |
+| Inti Firebase            | firebase_core                                   |
 
 ## Struktur Folder (`lib/`)
 
@@ -406,4 +406,3 @@ Sistem poin kontribusi saat ini berfungsi sebagai gamifikasi untuk mendorong par
 - **Program insentif berjenjang** berdasarkan tier (Pemula, Kontributor, Pro Reporter), dengan benefit yang meningkat seiring kenaikan level.
 
 Untuk mewujudkannya, diperlukan pengembangan tambahan seperti riwayat transaksi poin, mekanisme verifikasi laporan dan anti-kecurangan yang lebih ketat, serta kerja sama resmi dengan mitra dan pemangku kepentingan terkait.
-
