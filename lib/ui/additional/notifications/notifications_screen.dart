@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -95,8 +96,8 @@ class _NotificationTile extends StatelessWidget {
 
     return Material(
       color: notification.isRead
-          ? AppColors.surface
-          : AppColors.primaryTint.withValues(alpha: 0.5),
+          ? context.appColors.surface
+          : context.appColors.primaryTint.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -105,7 +106,7 @@ class _NotificationTile extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +136,7 @@ class _NotificationTile extends StatelessWidget {
                     Text(
                       DateFormatter.relative(notification.createdAt),
                       style: AppTextStyles.caption
-                          .copyWith(color: AppColors.textHint),
+                          .copyWith(color: context.appColors.textHint),
                     ),
                   ],
                 ),

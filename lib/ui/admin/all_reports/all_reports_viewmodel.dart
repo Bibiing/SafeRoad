@@ -22,13 +22,11 @@ class AllReportsViewModel extends ChangeNotifier {
   final String? adminUid;
 
   AllReportsViewModel({
-    required ReportRepository reportRepository,
-    required NotificationRepository notificationRepository,
-    required AuthRepository authRepository,
+    required this._reportRepository,
+    required this._notificationRepository,
+    required this._authRepository,
     this.adminUid,
-  })  : _reportRepository = reportRepository,
-        _notificationRepository = notificationRepository,
-        _authRepository = authRepository;
+  });
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

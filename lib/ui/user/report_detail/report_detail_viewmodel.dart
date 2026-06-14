@@ -16,10 +16,9 @@ class ReportDetailViewModel extends ChangeNotifier {
   final AuthRepository _authRepository;
 
   ReportDetailViewModel({
-    required ReportRepository reportRepository,
-    required AuthRepository authRepository,
-  })  : _reportRepository = reportRepository,
-        _authRepository = authRepository;
+    required this._reportRepository,
+    required this._authRepository,
+  });
 
   late final RealtimeSyncService _realtimeSync =
       RealtimeSyncService(_reportRepository);

@@ -23,7 +23,6 @@ class AppTextStyles {
         fontFamily: _fontFamily,
         fontSize: 22,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
         height: 1.3,
       );
 
@@ -31,7 +30,6 @@ class AppTextStyles {
         fontFamily: _fontFamily,
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
         height: 1.3,
       );
 
@@ -39,14 +37,12 @@ class AppTextStyles {
         fontFamily: _fontFamily,
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
       );
 
   static TextStyle get body => TextStyle(
         fontFamily: _fontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
         height: 1.5,
       );
 
@@ -54,7 +50,6 @@ class AppTextStyles {
         fontFamily: _fontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
       );
 
   static TextStyle get button => TextStyle(

@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +72,7 @@ class _MyReportsScreenState extends State<MyReportsScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: vm.reports.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final report = vm.reports[index];
                   return _MyReportCard(
@@ -139,11 +140,30 @@ class _MyReportCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 4),
-              Text(
-                DateFormatter.relative(report.createdAt),
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textHint,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      DateFormatter.relative(report.createdAt),
+                      style: AppTextStyles.caption.copyWith(
+                        color: context.appColors.textHint,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 12, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        '+${report.status.pointsEarned} Poin',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

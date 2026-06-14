@@ -20,12 +20,10 @@ class ReportRepositoryImpl implements ReportRepository {
   final LocationDataSource _locationDataSource;
 
   ReportRepositoryImpl({
-    required ReportRemoteDataSource reportDataSource,
-    required StorageRemoteDataSource storageDataSource,
-    required LocationDataSource locationDataSource,
-  })  : _reportDataSource = reportDataSource,
-        _storageDataSource = storageDataSource,
-        _locationDataSource = locationDataSource;
+    required this._reportDataSource,
+    required this._storageDataSource,
+    required this._locationDataSource,
+  });
 
   @override
   Future<String> createReport(Report report) {

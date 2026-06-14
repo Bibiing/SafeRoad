@@ -13,8 +13,7 @@ import '../../../domain/repository/report_repository.dart';
 class SearchViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
 
-  SearchViewModel({required ReportRepository reportRepository})
-      : _reportRepository = reportRepository;
+  SearchViewModel({required this._reportRepository});
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

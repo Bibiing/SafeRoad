@@ -15,10 +15,9 @@ class ProfileViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
 
   ProfileViewModel({
-    required AuthRepository authRepository,
-    required ReportRepository reportRepository,
-  })  : _authRepository = authRepository,
-        _reportRepository = reportRepository;
+    required this._authRepository,
+    required this._reportRepository,
+  });
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

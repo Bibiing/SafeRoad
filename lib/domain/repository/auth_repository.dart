@@ -39,4 +39,7 @@ abstract class AuthRepository {
 
   /// Tambahkan [delta] poin kontribusi ke `users/{uid}` (akumulatif).
   Future<void> incrementPoints(String uid, int delta);
+
+  /// Ambil daftar pengguna dengan poin tertinggi.
+  Future<List<AppUser>> getTopContributors(int limit);
 }

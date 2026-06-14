@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -105,7 +106,7 @@ class _TotalCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primaryTint,
+              color: context.appColors.primaryTint,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.assignment, color: AppColors.primary),
@@ -164,7 +165,7 @@ class _StatBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
               child: Stack(
                 children: [
-                  Container(height: 22, color: AppColors.background),
+                  Container(height: 22, color: context.appColors.background),
                   FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: fraction.clamp(0.0, 1.0),

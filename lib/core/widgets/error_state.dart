@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -31,7 +32,7 @@ class ErrorState extends StatelessWidget {
             Text(
               message,
               style:
-                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  AppTextStyles.body.copyWith(color: context.appColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[

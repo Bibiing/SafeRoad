@@ -1,8 +1,8 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/state/view_status.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/widgets/app_card.dart';
@@ -177,10 +177,10 @@ class _SearchResultTile extends StatelessWidget {
             const SizedBox(height: 2),
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.location_on,
                   size: 14,
-                  color: AppColors.textHint,
+                  color: context.appColors.textHint,
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -197,7 +197,7 @@ class _SearchResultTile extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             DateFormatter.relative(report.createdAt),
-            style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
+            style: AppTextStyles.caption.copyWith(color: context.appColors.textHint),
           ),
         ],
       ),

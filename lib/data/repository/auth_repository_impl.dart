@@ -67,4 +67,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> incrementPoints(String uid, int delta) {
     return _dataSource.incrementPoints(uid, delta);
   }
+
+  @override
+  Future<List<AppUser>> getTopContributors(int limit) async {
+    final dtos = await _dataSource.getTopContributors(limit);
+    return dtos.map((dto) => dto.toDomain()).toList();
+  }
 }

@@ -13,8 +13,7 @@ import '../../../domain/repository/report_repository.dart';
 class StatisticsViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
 
-  StatisticsViewModel({required ReportRepository reportRepository})
-      : _reportRepository = reportRepository;
+  StatisticsViewModel({required this._reportRepository});
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

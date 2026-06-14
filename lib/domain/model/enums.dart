@@ -4,6 +4,7 @@
 /// - [label] — teks tampilan dalam Bahasa Indonesia.
 /// - [toFirestore] — nilai string untuk disimpan ke Firestore.
 /// - Static factory [fromFirestore] — parse balik dari string.
+library;
 
 // ---------------------------------------------------------------------------
 // User Role
@@ -114,5 +115,19 @@ enum ReportStatus {
       (e) => e.name == value,
       orElse: () => ReportStatus.pending,
     );
+  }
+
+  /// Poin kontribusi yang telah diperoleh dari laporan dengan status ini.
+  int get pointsEarned {
+    switch (this) {
+      case ReportStatus.pending:
+      case ReportStatus.rejected:
+        return 10;
+      case ReportStatus.verified:
+      case ReportStatus.inProgress:
+        return 15;
+      case ReportStatus.completed:
+        return 40;
+    }
   }
 }

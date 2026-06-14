@@ -13,6 +13,7 @@ import 'data/remote/fcm_datasource.dart';
 import 'data/remote/location_datasource.dart';
 import 'data/remote/notification_remote_datasource.dart';
 import 'data/remote/report_remote_datasource.dart';
+import 'core/theme/theme_provider.dart';
 import 'data/remote/storage_remote_datasource.dart';
 import 'data/repository/auth_repository_impl.dart';
 import 'data/repository/notification_repository_impl.dart';
@@ -86,10 +87,14 @@ Future<void> main() async {
     }
   }());
 
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadFromPrefs();
+
   // ── Run App ────────────────────────────────────────────────────────
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: themeProvider),
         Provider<AuthRepository>.value(value: authRepository),
         Provider<ReportRepository>.value(value: reportRepository),
         Provider<NotificationRepository>.value(value: notificationRepository),

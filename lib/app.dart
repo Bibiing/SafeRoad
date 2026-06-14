@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_text_styles.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 import 'core/utils/connectivity_service.dart';
 import 'core/utils/local_notification_service.dart';
 import 'core/utils/notification_listener_service.dart';
@@ -43,10 +45,14 @@ class SafeRoadApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp(
       title: 'SafeRoad',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeProvider.themeMode,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: scaffoldMessengerKey,
       // Splash beranimasi sebagai layar pertama.
@@ -245,7 +251,7 @@ class _OfflineDialog extends StatelessWidget {
           Text(
             'Beberapa fitur mungkin terganggu karena tidak ada koneksi internet.',
             style: AppTextStyles.body
-                .copyWith(fontSize: 14, color: AppColors.textSecondary),
+                .copyWith(fontSize: 14, color: context.appColors.textSecondary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),

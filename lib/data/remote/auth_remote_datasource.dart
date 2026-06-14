@@ -40,6 +40,9 @@ abstract class AuthRemoteDataSource {
 
   /// Tambah poin kontribusi (akumulatif) ke dokumen user.
   Future<void> incrementPoints(String uid, int delta);
+
+  /// Ambil daftar pengguna dengan poin tertinggi.
+  Future<List<UserDto>> getTopContributors(int limit);
 }
 
 /// Implementasi [AuthRemoteDataSource] menggunakan Firebase Auth + Firestore.
@@ -220,5 +223,16 @@ class FirebaseAuthRemoteDataSource implements AuthRemoteDataSource {
     return _users.doc(uid).update({
       'contributionPoints': FieldValue.increment(delta),
     });
+  }
+
+  @override
+  Future<List<UserDto>> getTopContributors(int limit) async {
+    final snapshot = await _users
+        .orderBy('contributionPoints', descending: true)
+        .limit(limit)
+        .get();
+    return snapshot.docs
+        .map((doc) => UserDto.fromFirestore(doc.id, doc.data()))
+        .toList();
   }
 }

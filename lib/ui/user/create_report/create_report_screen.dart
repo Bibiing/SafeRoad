@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class _CreateReportBodyState extends State<_CreateReportBody> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.appColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -267,7 +268,7 @@ class _StepProgress extends StatelessWidget {
                 margin: EdgeInsets.only(right: i == total - 1 ? 0 : 6),
                 height: 6,
                 decoration: BoxDecoration(
-                  color: active ? AppColors.primary : AppColors.border,
+                  color: active ? AppColors.primary : context.appColors.border,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -319,10 +320,10 @@ class _CategoryGrid extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           child: Container(
             decoration: BoxDecoration(
-              color: active ? AppColors.primaryTint : AppColors.surface,
+              color: active ? context.appColors.primaryTint : context.appColors.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: active ? AppColors.primary : AppColors.border,
+                color: active ? AppColors.primary : context.appColors.border,
                 width: active ? 1.5 : 1,
               ),
             ),
@@ -331,7 +332,7 @@ class _CategoryGrid extends StatelessWidget {
               children: [
                 Icon(
                   CategoryHelper.iconOf(c),
-                  color: active ? AppColors.primary : AppColors.textSecondary,
+                  color: active ? AppColors.primary : context.appColors.textSecondary,
                   size: 28,
                 ),
                 const SizedBox(height: 8),
@@ -344,7 +345,7 @@ class _CategoryGrid extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.caption.copyWith(
                       color:
-                          active ? AppColors.primary : AppColors.textSecondary,
+                          active ? AppColors.primary : context.appColors.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -482,7 +483,7 @@ class _AddPhotoTile extends StatelessWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: AppColors.primaryTint.withValues(alpha: 0.4),
+          color: context.appColors.primaryTint.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
         ),
@@ -530,9 +531,9 @@ class _LocationSection extends StatelessWidget {
       return Container(
         height: 90,
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: context.appColors.background,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.appColors.border),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,

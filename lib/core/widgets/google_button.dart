@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -5,7 +6,7 @@ import '../theme/app_text_styles.dart';
 import '../theme/app_theme.dart';
 import 'google_logo.dart';
 
-/// Tombol "Masuk/Daftar dengan Google" — putih, border, logo Google.
+/// Tombol "Masuk/Daftar dengan Google" 窶・putih, border, logo Google.
 class GoogleSignInButton extends StatelessWidget {
   final String label;
   final bool loading;
@@ -25,9 +26,9 @@ class GoogleSignInButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: loading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          backgroundColor: AppColors.surface,
-          side: const BorderSide(color: AppColors.border),
+          foregroundColor: context.appColors.textPrimary,
+          backgroundColor: context.appColors.surface,
+          side: BorderSide(color: context.appColors.border),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radius),
           ),
@@ -49,7 +50,7 @@ class GoogleSignInButton extends StatelessWidget {
                   Text(
                     label,
                     style: AppTextStyles.button
-                        .copyWith(color: AppColors.textPrimary),
+                        .copyWith(color: context.appColors.textPrimary),
                   ),
                 ],
               ),

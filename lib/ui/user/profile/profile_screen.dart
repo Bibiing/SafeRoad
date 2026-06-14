@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +14,10 @@ import '../../../domain/repository/auth_repository.dart';
 import '../../../domain/repository/report_repository.dart';
 import '../../auth/login/login_screen.dart';
 import 'profile_viewmodel.dart';
+import '../../../core/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-/// Tab Profil — info user, tier/level, statistik kontribusi, achievement.
+/// Tab Profil 遯ｶ繝ｻinfo user, tier/level, statistik kontribusi, achievement.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -113,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Icon(
               a.icon,
-              color: status.unlocked ? AppColors.primary : AppColors.textHint,
+              color: status.unlocked ? AppColors.primary : context.appColors.textHint,
             ),
             const SizedBox(width: 10),
             Expanded(child: Text(a.title)),
@@ -191,6 +194,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: _showAchievement,
                   ),
                   const SizedBox(height: 28),
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      return SwitchListTile(
+                        title: const Text('Mode Gelap'),
+                        secondary: Icon(
+                          themeProvider.isDarkMode
+                              ? Icons.dark_mode_outlined
+                              : Icons.light_mode_outlined,
+                          color: context.appColors.textSecondary,
+                          size: 22,
+                        ),
+                        value: themeProvider.isDarkMode,
+                        onChanged: (value) {
+                          themeProvider.toggleTheme();
+                        },
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      );
+                    },
+                  ),
 
                   _MenuItem(
                     icon: Icons.help_outline,
@@ -243,7 +265,7 @@ class _ProfileHeader extends StatelessWidget {
     final hasPhoto = user.isGoogleProvider && (user.photoUrl?.isNotEmpty ?? false);
 
     Widget initialAvatar() => Container(
-          color: AppColors.primaryTint,
+          color: context.appColors.primaryTint,
           alignment: Alignment.center,
           child: Text(
             initial,
@@ -267,7 +289,7 @@ class _ProfileHeader extends StatelessWidget {
                 height: 96,
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryTint,
+                  color: context.appColors.primaryTint,
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.primary, width: 2),
                 ),
@@ -300,7 +322,7 @@ class _ProfileHeader extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.warning,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.surface, width: 2),
+                    border: Border.all(color: context.appColors.surface, width: 2),
                   ),
                   child: Text(
                     tier,
@@ -335,7 +357,7 @@ class _MethodRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.primaryTint,
+            color: context.appColors.primaryTint,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -349,9 +371,9 @@ class _MethodRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: context.appColors.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.appColors.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -359,13 +381,13 @@ class _MethodRow extends StatelessWidget {
               if (user.isGoogleProvider)
                 const GoogleLogo(size: 14)
               else
-                const Icon(Icons.email_outlined,
-                    size: 14, color: AppColors.textSecondary),
+                Icon(Icons.email_outlined,
+                    size: 14, color: context.appColors.textSecondary),
               const SizedBox(width: 6),
               Text(
                 user.providerLabel,
                 style: AppTextStyles.badge.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                 ),
               ),
             ],
@@ -393,9 +415,9 @@ class _StatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Row(
         children: [
@@ -406,7 +428,7 @@ class _StatsCard extends StatelessWidget {
               label: 'Laporan Dikirim',
             ),
           ),
-          _divider(),
+          _divider(context),
           Expanded(
             child: _StatItem(
               icon: Icons.check_circle_outline,
@@ -414,7 +436,7 @@ class _StatsCard extends StatelessWidget {
               label: 'Laporan Selesai',
             ),
           ),
-          _divider(),
+          _divider(context),
           Expanded(
             child: _StatItem(
               icon: Icons.star_outline,
@@ -427,8 +449,8 @@ class _StatsCard extends StatelessWidget {
     );
   }
 
-  Widget _divider() =>
-      Container(width: 1, height: 44, color: AppColors.border);
+  Widget _divider(BuildContext context) =>
+      Container(width: 1, height: 44, color: context.appColors.border);
 }
 
 class _StatItem extends StatelessWidget {
@@ -482,9 +504,9 @@ class _PointsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -517,7 +539,7 @@ class _PointsCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor: AppColors.primaryTint,
+              backgroundColor: context.appColors.primaryTint,
               valueColor:
                   const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
@@ -580,7 +602,7 @@ class _PointRule extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
-            color: AppColors.primaryTint,
+            color: context.appColors.primaryTint,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -620,17 +642,17 @@ class _AchievementsRow extends StatelessWidget {
                   height: 64,
                   decoration: BoxDecoration(
                     color: unlocked
-                        ? AppColors.primaryTint
-                        : AppColors.background,
+                        ? context.appColors.primaryTint
+                        : context.appColors.background,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: unlocked ? AppColors.primary : AppColors.border,
+                      color: unlocked ? AppColors.primary : context.appColors.border,
                       width: unlocked ? 1.5 : 1,
                     ),
                   ),
                   child: Icon(
                     item.achievement.icon,
-                    color: unlocked ? AppColors.primary : AppColors.textHint,
+                    color: unlocked ? AppColors.primary : context.appColors.textHint,
                     size: 30,
                   ),
                 ),
@@ -644,8 +666,8 @@ class _AchievementsRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.caption.copyWith(
                       color: unlocked
-                          ? AppColors.textSecondary
-                          : AppColors.textHint,
+                          ? context.appColors.textSecondary
+                          : context.appColors.textHint,
                     ),
                   ),
                 ),
@@ -683,10 +705,10 @@ class _MenuItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
             child: Row(
               children: [
-                Icon(icon, color: AppColors.textSecondary, size: 22),
+                Icon(icon, color: context.appColors.textSecondary, size: 22),
                 const SizedBox(width: 14),
                 Expanded(child: Text(label, style: AppTextStyles.body)),
-                const Icon(Icons.chevron_right, color: AppColors.textHint),
+                Icon(Icons.chevron_right, color: context.appColors.textHint),
               ],
             ),
           ),

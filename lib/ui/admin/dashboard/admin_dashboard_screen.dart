@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -132,7 +133,7 @@ class _AdminBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primaryTint,
+        color: context.appColors.primaryTint,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -181,7 +182,7 @@ class _StatCard extends StatelessWidget {
               Text(
                 label,
                 style: AppTextStyles.body.copyWith(
-                  color: AppColors.textPrimary,
+                  color: context.appColors.textPrimary,
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),

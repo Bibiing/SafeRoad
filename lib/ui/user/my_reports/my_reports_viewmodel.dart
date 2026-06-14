@@ -12,10 +12,9 @@ class MyReportsViewModel extends ChangeNotifier {
   final AuthRepository _authRepository;
 
   MyReportsViewModel({
-    required ReportRepository reportRepository,
-    required AuthRepository authRepository,
-  })  : _reportRepository = reportRepository,
-        _authRepository = authRepository;
+    required this._reportRepository,
+    required this._authRepository,
+  });
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -216,7 +217,7 @@ class _RegisterBodyState extends State<_RegisterBody>
                         Text(
                           'Sudah punya akun? ',
                           style: AppTextStyles.body.copyWith(
-                            color: AppColors.textSecondary,
+                            color: context.appColors.textSecondary,
                             fontSize: 14,
                           ),
                         ),

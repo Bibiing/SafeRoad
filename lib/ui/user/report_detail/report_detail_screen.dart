@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -123,13 +124,13 @@ class _DetailBody extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Foto (slideshow + full screen) ──
+          // 隨渉隨渉 Foto (slideshow + full screen) 隨渉隨渉
           if (report.imageUrls.isNotEmpty) ...[
             _PhotoSlideshow(imageUrls: report.imageUrls),
             const SizedBox(height: 16),
           ],
 
-          // ── Judul + Status ──
+          // 隨渉隨渉 Judul + Status 隨渉隨渉
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -142,7 +143,7 @@ class _DetailBody extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Field Info ──
+          // 隨渉隨渉 Field Info 隨渉隨渉
           _InfoField(label: 'Kategori', value: report.category.label),
           _InfoField(label: 'Deskripsi', value: report.description),
           _InfoField(
@@ -166,7 +167,7 @@ class _DetailBody extends StatelessWidget {
                   : AppColors.primary,
             ),
 
-          // ── Timeline Status ──
+          // 隨渉隨渉 Timeline Status 隨渉隨渉
           const SizedBox(height: 24),
           Text('Riwayat Status', style: AppTextStyles.title),
           const SizedBox(height: 12),
@@ -174,7 +175,7 @@ class _DetailBody extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primaryTint,
+                color: context.appColors.primaryTint,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -260,7 +261,7 @@ class _StatusTimeline extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Dot + Line ──
+              // 隨渉隨渉 Dot + Line 隨渉隨渉
               SizedBox(
                 width: 32,
                 child: Column(
@@ -277,14 +278,14 @@ class _StatusTimeline extends StatelessWidget {
                       Expanded(
                         child: Container(
                           width: 2,
-                          color: AppColors.border,
+                          color: context.appColors.border,
                         ),
                       ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
-              // ── Content ──
+              // 隨渉隨渉 Content 隨渉隨渉
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20),
@@ -302,7 +303,7 @@ class _StatusTimeline extends StatelessWidget {
                         Text(
                           log.note,
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.textPrimary,
+                            color: context.appColors.textPrimary,
                           ),
                         ),
                       ],
@@ -319,7 +320,7 @@ class _StatusTimeline extends StatelessWidget {
 }
 
 /// Slideshow foto laporan: [PageView] horizontal yang bisa diswipe, dengan
-/// indikator "x/total" dan dot indicator. Tap foto → galeri full screen.
+/// indikator "x/total" dan dot indicator. Tap foto 遶翫・galeri full screen.
 class _PhotoSlideshow extends StatefulWidget {
   final List<String> imageUrls;
 
@@ -382,7 +383,7 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
                         return Container(
-                          color: AppColors.primaryTint,
+                          color: context.appColors.primaryTint,
                           child: const Center(
                             child: SizedBox(
                               width: 22,
@@ -396,9 +397,9 @@ class _PhotoSlideshowState extends State<_PhotoSlideshow> {
                         );
                       },
                       errorBuilder: (_, _, _) => Container(
-                        color: AppColors.primaryTint,
-                        child: const Icon(Icons.broken_image,
-                            size: 48, color: AppColors.textHint),
+                        color: context.appColors.primaryTint,
+                        child: Icon(Icons.broken_image,
+                            size: 48, color: context.appColors.textHint),
                       ),
                     ),
                   ),
@@ -471,7 +472,7 @@ class _DotsIndicator extends StatelessWidget {
           width: active ? 18 : 7,
           height: 7,
           decoration: BoxDecoration(
-            color: active ? AppColors.primary : AppColors.border,
+            color: active ? AppColors.primary : context.appColors.border,
             borderRadius: BorderRadius.circular(4),
           ),
         );

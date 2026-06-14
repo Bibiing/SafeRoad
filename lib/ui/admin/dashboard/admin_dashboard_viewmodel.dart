@@ -10,8 +10,7 @@ import '../../../core/utils/error_mapper.dart';
 class AdminDashboardViewModel extends ChangeNotifier {
   final ReportRepository _reportRepository;
 
-  AdminDashboardViewModel({required ReportRepository reportRepository})
-      : _reportRepository = reportRepository;
+  AdminDashboardViewModel({required this._reportRepository});
 
   ViewStatus _status = ViewStatus.initial;
   ViewStatus get status => _status;

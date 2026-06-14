@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ import '../../../domain/repository/report_repository.dart';
 import '../report_detail/report_detail_screen.dart';
 import 'map_viewmodel.dart';
 
-/// Tab Peta — OpenStreetMap dengan marker semua laporan, filter, dan carousel.
+/// Tab Peta 遯ｶ繝ｻOpenStreetMap dengan marker semua laporan, filter, dan carousel.
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -161,12 +162,12 @@ class _MapScreenState extends State<MapScreen> {
                         ],
                       ),
                     const SimpleAttributionWidget(
-                      source: Text('© OpenStreetMap contributors'),
+                      source: Text('・ゑｽｩ OpenStreetMap contributors'),
                     ),
                   ],
                 ),
 
-                // ── Search + filter chips (atas) ──
+                // 隨渉隨渉 Search + filter chips (atas) 隨渉隨渉
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -185,7 +186,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-                // ── Tombol bulat refresh + my location ──
+                // 隨渉隨渉 Tombol bulat refresh + my location 隨渉隨渉
                 Positioned(
                   right: 16,
                   bottom: visible.isEmpty ? 32 : 168,
@@ -205,7 +206,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
 
-                // ── Carousel preview di bawah ──
+                // 隨渉隨渉 Carousel preview di bawah 隨渉隨渉
                 if (visible.isNotEmpty)
                   Positioned(
                     left: 0,
@@ -291,7 +292,7 @@ class _MapSearchField extends StatelessWidget {
           prefixIcon: const Icon(Icons.search),
           isDense: true,
           filled: true,
-          fillColor: AppColors.surface,
+          fillColor: context.appColors.surface,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           border: OutlineInputBorder(
@@ -358,7 +359,7 @@ class _FilterChip extends StatelessWidget {
         elevation: 1.5,
         borderRadius: BorderRadius.circular(20),
         shadowColor: Colors.black12,
-        color: active ? AppColors.primary : AppColors.surface,
+        color: active ? AppColors.primary : context.appColors.surface,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
@@ -369,14 +370,14 @@ class _FilterChip extends StatelessWidget {
                 Icon(
                   icon,
                   size: 16,
-                  color: active ? AppColors.onPrimary : AppColors.textSecondary,
+                  color: active ? AppColors.onPrimary : context.appColors.textSecondary,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: AppTextStyles.caption.copyWith(
                     color:
-                        active ? AppColors.onPrimary : AppColors.textSecondary,
+                        active ? AppColors.onPrimary : context.appColors.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -405,7 +406,7 @@ class _RoundButton extends StatelessWidget {
     return Material(
       elevation: 3,
       shape: const CircleBorder(),
-      color: filled ? AppColors.primary : AppColors.surface,
+      color: filled ? AppColors.primary : context.appColors.surface,
       shadowColor: Colors.black26,
       child: InkWell(
         onTap: onTap,
@@ -447,7 +448,7 @@ class _MapPreviewCard extends StatelessWidget {
         elevation: 4,
         borderRadius: BorderRadius.circular(16),
         shadowColor: Colors.black26,
-        color: AppColors.surface,
+        color: context.appColors.surface,
         child: InkWell(
           onTap: onTap,
           onHighlightChanged: (v) {
@@ -504,7 +505,7 @@ class _MapPreviewCard extends StatelessWidget {
                             child: Text(
                               DateFormatter.relative(report.createdAt),
                               style: AppTextStyles.caption
-                                  .copyWith(color: AppColors.textHint),
+                                  .copyWith(color: context.appColors.textHint),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -516,7 +517,7 @@ class _MapPreviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.textHint),
+                Icon(Icons.chevron_right, color: context.appColors.textHint),
               ],
             ),
           ),
@@ -532,8 +533,8 @@ class _MiniPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.primaryTint,
-      child: const Icon(Icons.photo_outlined, color: AppColors.textHint),
+      color: context.appColors.primaryTint,
+      child: Icon(Icons.photo_outlined, color: context.appColors.textHint),
     );
   }
 }

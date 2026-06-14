@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -108,7 +109,7 @@ class _SearchAndFilterBar extends StatelessWidget {
     final vm = context.watch<AllReportsViewModel>();
 
     return Container(
-      color: AppColors.surface,
+      color: context.appColors.surface,
       padding: const EdgeInsets.only(bottom: 8),
       child: Column(
         children: [
@@ -122,10 +123,10 @@ class _SearchAndFilterBar extends StatelessWidget {
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radius),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.appColors.border),
                 ),
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: context.appColors.background,
               ),
             ),
           ),
@@ -172,7 +173,7 @@ class _StatusChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: Material(
-        color: selected ? AppColors.primaryTint : AppColors.surface,
+        color: selected ? context.appColors.primaryTint : context.appColors.surface,
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: onTap,
@@ -182,7 +183,7 @@ class _StatusChip extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selected ? AppColors.primary : AppColors.border,
+                color: selected ? AppColors.primary : context.appColors.border,
               ),
             ),
             child: Row(
@@ -197,7 +198,7 @@ class _StatusChip extends StatelessWidget {
                   label,
                   style: AppTextStyles.caption.copyWith(
                     color:
-                        selected ? AppColors.primary : AppColors.textSecondary,
+                        selected ? AppColors.primary : context.appColors.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -241,7 +242,7 @@ class _ReportCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(report.address, style: AppTextStyles.caption),
 
-            // ── Galeri foto dari pelapor ──
+            // 髫ｨ貂可髫ｨ貂可 Galeri foto dari pelapor 髫ｨ貂可髫ｨ貂可
             if (report.imageUrls.isNotEmpty) ...[
               const SizedBox(height: 12),
               SizedBox(
@@ -265,7 +266,7 @@ class _ReportCard extends StatelessWidget {
                             return Container(
                               width: 90,
                               height: 90,
-                              color: AppColors.background,
+                              color: context.appColors.background,
                               child: const Center(
                                 child: SizedBox(
                                   width: 20,
@@ -281,10 +282,10 @@ class _ReportCard extends StatelessWidget {
                           errorBuilder: (_, _, _) => Container(
                             width: 90,
                             height: 90,
-                            color: AppColors.background,
-                            child: const Icon(
+                            color: context.appColors.background,
+                            child: Icon(
                               Icons.broken_image_outlined,
-                              color: AppColors.textHint,
+                              color: context.appColors.textHint,
                             ),
                           ),
                         ),
@@ -302,7 +303,7 @@ class _ReportCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: context.appColors.background,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -365,7 +366,7 @@ class _ReportCard extends StatelessWidget {
     final result = await showModalBottomSheet<_StatusChangeResult>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.appColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -394,7 +395,7 @@ class _StatusChangeResult {
   const _StatusChangeResult(this.status, this.reason);
 }
 
-/// Bottom sheet "Ubah Status Laporan" — konsisten dengan sistem hijau SafeRoad.
+/// Bottom sheet "Ubah Status Laporan" 驕ｯ・ｶ郢晢ｽｻkonsisten dengan sistem hijau SafeRoad.
 ///
 /// Menampilkan pilihan status (pending dikecualikan) sebagai daftar [ListTile]
 /// dengan [StatusPill]. Bila `rejected` dipilih, alasan penolakan wajib diisi.
@@ -408,7 +409,7 @@ class _StatusChangeSheet extends StatefulWidget {
 }
 
 class _StatusChangeSheetState extends State<_StatusChangeSheet> {
-  // Admin tidak mengembalikan laporan ke pending → dikecualikan dari pilihan.
+  // Admin tidak mengembalikan laporan ke pending 驕ｶ鄙ｫ繝ｻdikecualikan dari pilihan.
   static const _options = [
     ReportStatus.verified,
     ReportStatus.inProgress,
@@ -460,7 +461,7 @@ class _StatusChangeSheetState extends State<_StatusChangeSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: context.appColors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -480,7 +481,7 @@ class _StatusChangeSheetState extends State<_StatusChangeSheet> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Material(
-                  color: selected ? AppColors.primaryTint : AppColors.surface,
+                  color: selected ? context.appColors.primaryTint : context.appColors.surface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -494,7 +495,7 @@ class _StatusChangeSheetState extends State<_StatusChangeSheet> {
                         borderRadius: BorderRadius.circular(AppTheme.radius),
                         border: Border.all(
                           color:
-                              selected ? AppColors.primary : AppColors.border,
+                              selected ? AppColors.primary : context.appColors.border,
                         ),
                       ),
                       child: Row(
@@ -507,7 +508,7 @@ class _StatusChangeSheetState extends State<_StatusChangeSheet> {
                                 : Icons.radio_button_unchecked,
                             color: selected
                                 ? AppColors.primary
-                                : AppColors.textHint,
+                                : context.appColors.textHint,
                             size: 20,
                           ),
                         ],

@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -142,7 +143,7 @@ class _LoginBodyState extends State<_LoginBody>
                         'Masuk untuk mulai melaporkan',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.appColors.textSecondary,
                           fontSize: 15,
                         ),
                       ),
@@ -235,7 +236,7 @@ class _LoginBodyState extends State<_LoginBody>
                           Text(
                             'Belum punya akun? ',
                             style: AppTextStyles.body.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.appColors.textSecondary,
                               fontSize: 14,
                             ),
                           ),

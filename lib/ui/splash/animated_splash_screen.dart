@@ -1,3 +1,4 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -14,8 +15,8 @@ import '../../domain/repository/auth_repository.dart';
 /// ke alur [AuthGate].
 ///
 /// Animasi (memakai `flutter_animate`):
-/// - Logo: fade-in + scale-up (0.8 → 1.0) + sedikit naik (16px → 0) dengan
-///   curve `easeOutCubic`, lalu satu micro pulse halus (1.0 → 1.02 → 1.0).
+/// - Logo: fade-in + scale-up (0.8 遶翫・1.0) + sedikit naik (16px 遶翫・0) dengan
+///   curve `easeOutCubic`, lalu satu micro pulse halus (1.0 遶翫・1.02 遶翫・1.0).
 ///   Di bawah logo ada bayangan hijau lembut yang mengikuti bentuk logo
 ///   (kesan "mengambang"), bukan glow mencolok.
 /// - Teks "SafeRoad" + tagline: fade-in + slide-up berurutan (staggered).
@@ -60,11 +61,11 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.primaryTint, AppColors.background],
+            colors: [context.appColors.primaryTint, context.appColors.background],
             stops: [0.0, 0.55],
           ),
         ),
@@ -72,7 +73,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Logo + bayangan hijau natural ───────────────────────
+              // 隨渉隨渉 Logo + bayangan hijau natural 隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉
               const _LogoWithShadow()
                   .animate()
                   .fadeIn(duration: 600.ms, curve: Curves.easeOut)
@@ -106,7 +107,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
 
               const SizedBox(height: 28),
 
-              // ── Teks "SafeRoad" ─────────────────────────────────────
+              // 隨渉隨渉 Teks "SafeRoad" 隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉
               Text(
                 AppConstants.appName,
                 style: AppTextStyles.heading.copyWith(
@@ -121,12 +122,12 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
 
               const SizedBox(height: 8),
 
-              // ── Tagline ─────────────────────────────────────────────
+              // 隨渉隨渉 Tagline 隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉隨渉
               Text(
                 AppConstants.appTagline,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                   fontSize: 13,
                 ),
               )
@@ -144,7 +145,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
 /// Logo SafeRoad dengan bayangan hijau lembut.
 ///
 /// Bayangan dibuat dari siluet logo itu sendiri (di-tint hijau via
-/// `BlendMode.srcIn`), di-blur, lalu digeser sedikit ke bawah — sehingga
+/// `BlendMode.srcIn`), di-blur, lalu digeser sedikit ke bawah 遯ｶ繝ｻsehingga
 /// bayangan mengikuti bentuk logo dan tidak terlihat seperti kotak meski
 /// logo punya area transparan.
 class _LogoWithShadow extends StatelessWidget {

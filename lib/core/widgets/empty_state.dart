@@ -1,6 +1,6 @@
+import 'package:saferoad/core/theme/app_colors_extension.dart';
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
 /// Tampilan kondisi kosong yang seragam lintas modul.
@@ -33,13 +33,13 @@ class EmptyState extends StatelessWidget {
             Icon(
               icon,
               size: 64,
-              color: AppColors.textHint.withValues(alpha: 0.5),
+              color: context.appColors.textHint.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
               title,
               style:
-                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  AppTextStyles.body.copyWith(color: context.appColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
