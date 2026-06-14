@@ -24,8 +24,6 @@ abstract class ReportRepository {
   /// Pantau satu laporan secara realtime (dipakai layar detail agar perubahan
   /// status oleh admin langsung tampil tanpa refresh manual).
   ///
-  /// Catatan: hanya detail laporan yang realtime. Daftar (beranda/peta/laporan
-  /// saya/kelola) tetap one-shot + refresh manual.
   Stream<Report?> watchReport(String id);
 
   /// Ambil semua laporan milik [userId], urut terbaru di atas.
@@ -33,6 +31,9 @@ abstract class ReportRepository {
 
   /// Ambil semua laporan (untuk peta / beranda), urut terbaru di atas.
   Future<List<Report>> getAllReports();
+
+  /// Pantau semua laporan secara realtime, urut terbaru di atas.
+  Stream<List<Report>> watchAllReports();
 
   /// Ambil daftar status log untuk laporan [reportId], urut kronologis.
   Future<List<ReportStatusLog>> getStatusLogs(String reportId);

@@ -51,6 +51,23 @@ class AdminDashboardScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
+                  if (vm.hasNewReports) ...[
+                    _NewReportBanner(
+                      count: vm.newReportsCount,
+                      latestTitle: vm.latestNewReport?.title,
+                      onTap: () {
+                        vm.clearNewReportNotification();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AllReportsScreen(),
+                          ),
+                        );
+                      },
+                      onDismiss: vm.clearNewReportNotification,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   // ── Grid Statistik ──
                   GridView.count(
                     crossAxisCount: 2,
@@ -138,6 +155,109 @@ class _AdminBadge extends StatelessWidget {
       child: Text(
         'Admin',
         style: AppTextStyles.badge.copyWith(color: AppColors.primary),
+      ),
+    );
+  }
+}
+
+class _NewReportBanner extends StatelessWidget {
+  final int count;
+  final String? latestTitle;
+  final VoidCallback onTap;
+  final VoidCallback onDismiss;
+
+  const _NewReportBanner({
+    required this.count,
+    required this.latestTitle,
+    required this.onTap,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final title = count == 1
+        ? 'Ada laporan baru masuk'
+        : 'Ada $count laporan baru masuk';
+    final subtitle = latestTitle == null || latestTitle!.isEmpty
+        ? 'Ketuk untuk melihat daftar laporan.'
+        : latestTitle!;
+
+    return Material(
+      color: AppColors.primaryTint,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
+          ),
+          child: Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(
+                    Icons.notifications_active_outlined,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
+                  Positioned(
+                    right: -6,
+                    top: -6,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      decoration: BoxDecoration(
+                        color: AppColors.error,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        count > 99 ? '99+' : '$count',
+                        style: AppTextStyles.badge.copyWith(fontSize: 10),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.subtitle.copyWith(
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onDismiss,
+                icon: const Icon(Icons.close, size: 18),
+                color: AppColors.textSecondary,
+                tooltip: 'Tutup',
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
