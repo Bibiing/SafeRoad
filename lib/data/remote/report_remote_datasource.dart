@@ -26,6 +26,9 @@ abstract class ReportRemoteDataSource {
   /// Ambil semua laporan.
   Future<List<ReportDto>> getAllReports();
 
+  /// Stream realtime semua laporan.
+  Stream<List<ReportDto>> watchAllReports();
+
   /// Ambil status log untuk laporan [reportId].
   Future<List<ReportStatusLogDto>> getStatusLogs(String reportId);
 
@@ -92,6 +95,15 @@ class FirestoreReportRemoteDataSource implements ReportRemoteDataSource {
     return snap.docs
         .map((d) => ReportDto.fromFirestore(d.id, d.data()))
         .toList(growable: false);
+  }
+
+  @override
+  Stream<List<ReportDto>> watchAllReports() {
+    return _reports.orderBy('createdAt', descending: true).snapshots().map(
+          (snap) => snap.docs
+              .map((d) => ReportDto.fromFirestore(d.id, d.data()))
+              .toList(growable: false),
+        );
   }
 
   @override

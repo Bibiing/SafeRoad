@@ -72,6 +72,13 @@ class ReportRepositoryImpl implements ReportRepository {
   }
 
   @override
+  Stream<List<Report>> watchAllReports() {
+    return _reportDataSource
+        .watchAllReports()
+        .map((dtos) => dtos.map((d) => d.toDomain()).toList(growable: false));
+  }
+
+  @override
   Future<List<ReportStatusLog>> getStatusLogs(String reportId) async {
     final dtos = await _reportDataSource.getStatusLogs(reportId);
     return dtos.map((d) => d.toDomain()).toList(growable: false);
